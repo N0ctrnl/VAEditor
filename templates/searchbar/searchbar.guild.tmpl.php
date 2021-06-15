@@ -9,7 +9,7 @@
   if ($guilds) {
     foreach ($guilds as $guild): extract($guild);
 ?>
-                <option value="index.php?editor=<?=$curreditor?>&guildid=<?=$guild['id']?>"<?php if ($currguild == $guild['id']): ?> selected<?php endif;?>><?=$guild['name']?></option>
+                <option value="index.php?editor=<?=$curreditor?>&guildid=<?=$guild['id']?>"<?php if ($currguild == $guild['id']): ?> selected<?php endif;?>><?=$guild['name']?> [<?=$guild['id']?>] </option>
 <?
     endforeach;
   }

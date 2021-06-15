@@ -6,14 +6,14 @@
               <select OnChange="gotosite(this.options[this.selectedIndex].value)">
                 <option value="">Select a Tradeskill</option>
 <?php foreach ($tradeskills as $k => $v): ?>
-                <option value="index.php?editor=tradeskill&ts=<?=$k?>"<?echo ($currts == $k) ? " selected" : "";?>><?=$v?></option>
+                <option value="index.php?editor=tradeskill&ts=<?=$k?>"<?echo ($currts == $k) ? " selected" : "";?>><?=$v?> [<?=$k?>] </option>
 <?php endforeach;?>
               </select>
               &nbsp; and &nbsp;
               <select OnChange="gotosite(this.options[this.selectedIndex].value)">
                 <option value="">Select a Recipe</option>
 <?php foreach ($recipes as $k => $v): ?>
-                <option value="index.php?editor=tradeskill&ts=<?=$currts?>&rec=<?=$v['id']?>"<?echo ($currrec == $v['id']) ? " selected" : "";?>><?=$v['name']?></option>
+                <option value="index.php?editor=tradeskill&ts=<?=$currts?>&rec=<?=$v['id']?>"<?echo ($currrec == $v['id']) ? " selected" : "";?>><?=$v['name']?> [<?=$v['id']?>] </option>
 <?php endforeach;?>
               </select>
             </td>

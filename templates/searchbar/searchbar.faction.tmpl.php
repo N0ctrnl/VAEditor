@@ -6,7 +6,7 @@
               &nbsp;<select OnChange="gotosite(this.options[this.selectedIndex].value)">
                 <option value="">Select a Faction</option>
 <?php foreach ($factions as $faction): extract($faction);?>
-                <option value="index.php?editor=<?=$curreditor?>&fid=<?=$id?>"<?php if ($currfaction == $id): ?> selected<?php endif;?>><?=$name?></option>
+                <option value="index.php?editor=<?=$curreditor?>&fid=<?=$id?>"<?php if ($currfaction == $id): ?> selected<?php endif;?>><?=$name?> [<?=$id?>] </option>
 <?php endforeach;?>
               </select>
             </td>

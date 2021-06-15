@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
   <head>
     <meta name="viewport" content="width=800">
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-    <script>
+    <script type="text/javascript">
       function gotosite(site) { if (site != "") { self.location=site; } }
     </script>
-    <script>
+    <script type="text/javascript">
       function clearField(obj) { obj.value=""; }
     </script>
 
