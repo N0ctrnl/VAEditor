@@ -73,7 +73,7 @@ switch ($editor) {
     $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Alternate Currency</a>";
     break;
   case 'quest':
-    $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Quest Editor</a>";
+    $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Quest Viewer</a>";
     break;
   case 'inv':
     $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Player Inventory</a>";
@@ -98,6 +98,15 @@ switch ($editor) {
     break;
   case 'expeditions':
     $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Expeditions</a>";
+    break;
+  case 'sharedtasks':
+    $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Shared Tasks</a>";
+    break;
+  case 'mercs':
+    $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Mercenaries</a>";
+    break;
+  case 'chat':
+    $breadcrumbs = "<a href='index.php?editor=" . $editor . "'>Chat Channels</a>";
     break;
 }
 

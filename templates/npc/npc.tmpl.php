@@ -57,7 +57,7 @@ if ($loottable_id > 0) {
                 <table style="font-size: 12px; margin-bottom: 80px;">
                   <tr>
                     <td>
-<?if($isquest == 1) {?>
+<?if ($isquest == 1) {?>
                       <a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=71"><center><strong>Is Quest NPC</strong></center><br> </a>
 <?}?>
                       <strong>Race:</strong> <?echo "<a title='Race: " . $race . "'>" . $races[$race] . "</a>";?><br>
@@ -65,9 +65,21 @@ if ($loottable_id > 0) {
                       <strong>Level:</strong> <?=$level?><br>
                       <strong>Max Level:</strong> <?=$maxlevel?><br>
                       <strong>Body Type:</strong> <?echo "<a title='Body Type: " . $bodytype . "'>" . $bodytypes[$bodytype] . "</a>";?><br>
-                      <strong>Vendor:</strong> <a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=22" title="View/Change"><?echo ($merchant_id != 0 ? $merchant_id : "no");?></a><br>
-                      <strong>Alt Currency:</strong> <a href="index.php?editor=altcur&npcid=<?=$id?>&action=<?echo ($alt_currency_id != 0) ? '10">' . get_currency_name($alt_currency_id) : '8">no';?></a><br>
-                      <strong>Adventure:</strong> <a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=29" title="View/Change"><?echo ($adventure_template_id != 0 ? $adventure_template_id : "no");?></a><br>
+<?if ($merchant_id != 0):?>
+                      <strong>Vendor:</strong> <a href="index.php?editor=merchant&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>" title="View"><?=$merchant_id?></a><br>
+<?else:?>
+                      <strong>Vendor:</strong> <a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=22" title="Change">no</a><br>
+<?endif;?>
+<?if ($alt_currency_id != 0):?>
+                      <strong>Alt Currency:</strong> <a href="index.php?editor=altcur&npcid=<?=$id?>&action=10" title="View"><?echo get_currency_name($alt_currency_id);?></a><br>
+<?else:?>
+                      <strong>Alt Currency:</strong> <a href="index.php?editor=altcur&npcid=<?=$id?>&action=8" title="Change">no</a><br>
+<?endif;?>
+<?if ($adventure_template_id != 0):?>
+                      <strong>Adventure:</strong> <a href="index.php?editor=adventures&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>" title="View"><?=$adventure_template_id?></a><br>
+<?else:?>
+                      <strong>Adventure:</strong> <a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=29" title="Change">no</a><br>
+<?endif;?>
                       <strong>Trap:</strong> <a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=31" title="View/Change"><?echo ($trap_template != 0 ? $trap_template : "no");?></a><br>
 <?if($armortint_id > 0) {?>
                       <strong>Tint:</strong> <a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&tint_id=<?=$armortint_id?>&action=33"><?=$armortint_id?></a><br>
@@ -90,7 +102,7 @@ if ($loottable_id > 0) {
                 </table>
                 <div style="padding: 10px; border: 1px solid grey; margin-right: 10px;">
                   <b>NPC Faction ID</b>: <?=$npc_faction_id?> [<a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=3">edit</a>]
-                  [<a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&npcfid=<?=$npc_faction_id?>&action=47">update</a>]<br>
+                  [<a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&npcfid=<?=$npc_faction_id?>&action=47">update</a>]<br><br>
 <?if ($npc_faction_id > 0) {?>
                   "<a href="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=10"><?=$factionname?></a>"<br><br>
 <?}?>
@@ -115,6 +127,7 @@ if ($loottable_id > 0) {
 <?} else {?>
                 None<br>
 <?}?>
+                  <br><b>Faction Amount: </b><?=$faction_amount?>
                 </div>
               </center>
             </td>
@@ -134,7 +147,7 @@ if ($loottable_id > 0) {
                   </tr>
                   <tr>
                     <td align="left" width="34%">ATK: <?=$ATK?></td>
-                    <td align="left" width="33%">See Invis: <?=$yesno[$see_invis]?></td>
+                    <td align="left" width="33%">See Invis: <?echo ($see_invis > 0) ? "Yes (" . $see_invis . ")": "No";?></td>
                     <td align="left" width="34%">See ITU: <?=$yesno[$see_invis_undead]?></td>
                   </tr>
                   <tr>
@@ -221,8 +234,8 @@ if ($loottable_id > 0) {
                   </tr>
                   <tr>
                     <td align="left" width="33%">HP Regen: <?=$hp_regen_rate?></td>
-                    <td align="left" width="33%">MP Regen: <?=$mana_regen_rate?></td>
-                    <td align="left" width="34%">&nbsp;</td>
+                    <td align="left" width="33%">HP Regen: <?=$hp_regen_per_second?>/sec</td>
+                    <td align="left" width="34%">MP Regen: <?=$mana_regen_rate?></td>
                   </tr>
                   <tr>
                     <td align="left" width="33%">Aggro: <?=$aggroradius?></td>
@@ -248,6 +261,11 @@ if ($loottable_id > 0) {
                     <td align="left" width="33%">Slow Mit: <?=$slow_mitigation?> (<?=$slotmit?>%)</td>
                     <td align="left" width="33%">Heal Scale: <?=$healscale?>%</td>
                     <td align="left" width="34%">NPC Aggro: <?=$npc_aggro?></td>
+                  </tr>
+                  <tr>
+                    <td align="left" width="33%">Heroic Strikethrough: <?=$heroic_strikethrough?></td>
+                    <td align="left" width="33%">&nbsp;</td>
+                    <td align="left" width="34%">&nbsp;</td>
                   </tr>
                   <tr>
                     <td colspan="3">Special Abilities: <?echo ($new_special_abilities) ? $new_special_abilities : "None";?></td>
@@ -297,6 +315,11 @@ if ($loottable_id > 0) {
                    <td align="left" width="33%">Melee2 Type: <?=$sec_melee_type?></td>
                    <td align="left" width="34%">Model: <?echo ($model != 0) ? $model : "None";?></td>
                   </tr>
+                  <tr>
+                   <td align="left" width="33%">Show Name: <?=$yesno[$show_name]?></td>
+                   <td align="left" width="33%">&nbsp;</td>
+                   <td align="left" width="34%">&nbsp;</td>
+                  </tr>
                 </table>
               </fieldset>
               <fieldset>
@@ -340,6 +363,11 @@ if ($loottable_id > 0) {
                   <tr>
                     <td align="left" width="33%">Flymode: <?=$flymodetype[$flymode]?></td>
                     <td align="left" width="33%">Stuck Behavior: <?=$stuck_behavior?></td>
+                    <td align="left" width="34%">Keeps Sold Items: <?=$keeps_sold_items?></td>
+                  </tr>
+                  <tr>
+                    <td align="left" width="33%">Trap Template: <?=$trap_template?></td>
+                    <td align="left" width="33%">&nbsp;</td>
                     <td align="left" width="34%">&nbsp;</td>
                   </tr>
                 </table>
@@ -361,6 +389,7 @@ if ($loottable_id > 0) {
         <input type="hidden" name="herosforgemodel" value="<?=$herosforgemodel?>">
         <input type="hidden" name="size" value="<?=$size?>">
         <input type="hidden" name="hp_regen_rate" value="<?=$hp_regen_rate?>">
+        <input type="hidden" name="hp_regen_per_second" value="<?=$hp_regen_per_second?>">
         <input type="hidden" name="mana_regen_rate" value="<?=$mana_regen_rate?>">
         <input type="hidden" name="loottable_id" value="<?=$loottable_id?>">
         <input type="hidden" name="merchant_id" value="<?=$merchant_id?>">
@@ -441,6 +470,7 @@ if ($loottable_id > 0) {
         <input type="hidden" name="raid_target" value="<?=$raid_target?>">
         <input type="hidden" name="light" value="<?=$light?>">
         <input type="hidden" name="ignore_despawn" value="<?=$ignore_despawn?>">
+        <input type="hidden" name="show_name" value="<?=$show_name?>">
         <input type="hidden" name="charm_ac" value="<?=$charm_ac?>">
         <input type="hidden" name="charm_min_dmg" value="<?=$charm_min_dmg?>">
         <input type="hidden" name="charm_max_dmg" value="<?=$charm_max_dmg?>">
@@ -455,6 +485,9 @@ if ($loottable_id > 0) {
         <input type="hidden" name="flymode" value="<?=$flymode?>">
         <input type="hidden" name="always_aggro" value="<?=$always_aggro?>">
         <input type="hidden" name="exp_mod" value="<?=$exp_mod?>">
+        <input type="hidden" name="heroic_strikethrough" value="<?=$heroic_strikethrough?>">
+        <input type="hidden" name="faction_amount" value="<?=$faction_amount?>">
+        <input type="hidden" name="keeps_sold_items" value="<?=$keeps_sold_items?>">
         <center>
           NEW ID:<input type="text" name="id" size="10" value="<?=$suggestedid?>">
           <input type="submit" value="Copy NPC">

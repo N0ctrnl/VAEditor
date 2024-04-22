@@ -21,10 +21,17 @@
                 <tr>
                   <td align="left" width="20%">Duration Code: <?=$duration_codes[$duration_code]?></td>
                   <td align="left" width="20%">Duration: <?=$duration?></td>
-                  <td align="left" width="20%">Min Level: <?=$minlevel?></td>
-                  <td align="left" width="20%">Max Level:  <?=$maxlevel?></td>              
+                  <td align="left" width="20%">Min Level: <?=$min_level?></td>
+                  <td align="left" width="20%">Max Level:  <?=$max_level?></td>              
                   <td align="left" width="20%">Repeatable: <?=$yesno[$repeatable]?></td>
-                </tr> 
+                </tr>
+                <tr>
+                  <td align="left" width="20%">Level Spread: <?=$level_spread?></td>
+                  <td align="left" width="20%">Min Players: <?=$min_players?></td>
+                  <td align="left" width="20%">Max Players: <?=$max_players?></td>
+                  <td align="left" width="20%">DZ Template ID: <?echo ($dz_template_id > 0) ? "<a href='index.php?editor=expeditions&id=" . $dz_template_id . "&action=34'>" . $dz_template_id . "</a>" : $dz_template_id;?></td>
+                  <td align="left" width="20%">Enabled: <?echo ($enabled == 1) ? "Yes" : "No";?></td>
+                </tr>
               </table>
             </fieldset><br>
             <fieldset>
@@ -39,28 +46,27 @@
               <legend><strong>Completion</font></strong></legend>
               <table width="100%" border="0" cellpadding="3" cellspacing="0">
                 <tr>
-                  <td align="left" width="50%" colspan="2">Reward Text: "<?=$reward?>"</td>
-                  <td align="left" width="50%" colspan="2">Reward Method: <?=$rewardmethods[$rewardmethod]?></td>
+                  <td align="left" width="50%" colspan="2">Reward Text: "<?=$reward_text?>"</td>
+                  <td align="left" width="25%">Reward Method: <?=$rewardmethods[$reward_method]?></td>
+                  <td align="left" width="25%">Reward Faction: <?=$faction_reward?></td>
                 </tr>
                 <tr>
-                  <td align="left" width="35%">
-                    Reward:
-<?if(($rewardmethod == 0 || $rewardmethod == 2) && $rewardid > 1000):?>
-                    <a href="index.php?editor=items&tskid=<?=$id?>&id=<?=$rewardid?>&action=2"><?echo $rewardid . " - " . get_item_name($rewardid)?></a> <span>[<a href="https://lucy.allakhazam.com/item.html?id=<?=$rewardid?>" target="_blank">Lucy</a>]</span>
-<?endif;?> 
-<?if($rewardmethod == 2 && $rewardid < 1001):?>
-                    <?=$rewardid?>
-<?endif;?> 
-<?if($rewardmethod == 1 && $rewardid > 0 && $rewardid < 1001):?>
-                    <a href="index.php?editor=tasks&tskid=<?=$id?>&lid=<?=$rewardid?>&action=11"><?=$rewardid?></a>
-<?endif;?> 
-<?if($rewardmethod == 1 && $rewardid == 0):?>
-                    <a href="index.php?editor=tasks&tskid=<?=$id?>&action=12"><?=$rewardid?></a>
-<?endif;?>
-                  </td>
-                  <td align="left" width="20%">Reward Cash: <?=$cashreward?></td>
-                  <td align="left" width="20%">Reward XP: <?=$xpreward?></td>
-                  <td align="left" width="20%">Reward Faction: <?=$faction_reward?></td>
+                  <td align="left" width="25%">Reward ID List: <?=$reward_id_list?></td>
+                  <td align="left" width="25%">Reward Cash: <?=$cash_reward?></td>
+                  <td align="left" width="25%">Reward EXP: <?=$exp_reward?></td>
+                  <td align="left" width="25%">Faction Amount: <?=$faction_amount?></td>
+                </tr>
+                <tr>
+                  <td align="left" width="25%">Reward Points: <?=$reward_points?></td>
+                  <td align="left" width="25%">Reward Point Type: <?=$reward_point_types[$reward_point_type]?> (<?=$reward_point_type?>)</td>
+                  <td align="left" width="25%">Lock Activity ID: <?echo ($lock_activity_id > -1) ? $lock_activity_id . "*" : "None";?> (<?=$lock_activity_id?>)</td>
+                  <td align="left" width="25%">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td align="left" width="25%">Replay Timer Group: <?=$replay_timer_group?></td>
+                  <td align="left" width="25%">Replay Timer: <?=$replay_timer_seconds?></td>
+                  <td align="left" width="25%">Request Timer Group: <?=$request_timer_group?></td>
+                  <td align="left" width="25%">Request Timer: <?=$request_timer_seconds?></td>
                 </tr>
                 <tr>
                   <td align="left" width="100%" colspan="4">Completion Emote: "<?=$completion_emote?>"</td>
@@ -87,61 +93,28 @@
 <?if(isset($activity)):?>
       <tr>
         <td align="center" width="5%"><strong>Activity ID</strong></td>
+        <td align="center" width="5%"><strong>REQ ID</strong></td>
         <td align="center" width="5%"><strong>Step</strong></td>
         <td align="center" width="5%"><strong>Type</strong></td>
-        <td align="center" width="10%"><strong>Target</strong></td>
-        <td align="center" width="10%"><strong>Item</strong></td>
-        <td align="center" width="10%"><strong>Override</strong></td>
-        <td align="center" width="5%"><strong>Goal ID</strong></td>
+        <td align="center" width="15%"><strong>Target</strong></td>
+        <td align="center" width="15%"><strong>Item</strong></td>
+        <td align="center" width="15%"><strong>Override</strong></td>
         <td align="center" width="5%"><strong>Goal Method</strong></td>
         <td align="center" width="5%"><strong>Goal Count</strong></td>
-        <td align="center" width="5%"><strong>Deliver NPC</strong></td>
         <td align="center" width="5%"><strong>Optional</strong></td>
         <td width="5%"></td>
       </tr>
 <?$x=0; foreach($activity as $activity=>$v):?>
       <tr bgcolor="#<? echo ($x % 2 == 0) ? "BBBBBB" : "AAAAAA";?>">
-        <td align="center" width="5%"><?=$v['activityid']?></td>
+        <td align="center" width="5%"><?=$v['activityid']?><?echo ($lock_activity_id == $v['activityid']) ? "*" : "";?></td>
+        <td align="center" width="5%"><?=$v['req_activity_id']?></td>
         <td align="center" width="5%"><?=$v['step']?></td>
         <td align="center" width="5%"><?=$activitytypes[$v['activitytype']]?></td>
-        <td align="center" width="10%"><?=$v['target_name']?></td>  
-        <td align="center" width="10%"><?=$v['item_list']?></td>
-        <td align="center" width="10%"><?=$v['description_override']?></td>
-<?if($v['activitytype'] == 5 && $v['goalid'] == 0):?>
-        <td align="center" width="5%"><a href="index.php?editor=tasks&tskid=<?=$id?>&aid=<?=$v['activityid']?>&atype=<?=$v['activitytype']?>&action=21"><?=$v['goalid']?></td>
-<?endif;?>
-<?if($v['activitytype'] == 5 && $v['goalid'] > 0):?>
-        <td align="center" width="5%"><a href="index.php?editor=tasks&tskid=<?=$id?>&eid=<?=$v['goalid']?>&aid=<?=$v['activityid']?>&atype=<?=$v['activitytype']?>&action=17"><?=$v['goalid']?></td>
-<?endif;?>
-<?if(($v['activitytype'] == 3 || $v['activitytype'] == 2 || $v['activitytype'] == 7 || $v['activitytype'] == 8  || $v['activitytype'] == 6) && $v['goalid'] == 0 && $v['goalmethod'] == 1):?>
-        <td align="center" width="5%"><a href="index.php?editor=tasks&tskid=<?=$id?>&aid=<?=$v['activityid']?>&atype=<?=$v['activitytype']?>&action=23"><?=$v['goalid']?></td>
-<?endif;?>
-<?if(($v['activitytype'] == 3 || $v['activitytype'] == 2 || $v['activitytype'] == 7 || $v['activitytype'] == 8  || $v['activitytype'] == 6) && $v['goalid'] > 0 && $v['goalmethod'] == 1):?>
-        <td align="center" width="5%"><a href="index.php?editor=tasks&tskid=<?=$id?>&lid=<?=$v['goalid']?>&aid=<?=$v['activityid']?>&atype=<?=$v['activitytype']?>&action=26"><?=$v['goalid']?></td>
-<?endif;?>
-<?if($v['activitytype'] > 8 || $v['activitytype'] == 0):?>
-        <td align="center" width="5%"><?=$v['goalid']?></td>
-<?endif;?>
-<?if(($v['activitytype'] == 4 && $v['goalmethod'] != 2) || ($v['goalmethod'] != 1 && $v['activitytype'] == 2)) :?>
-        <td align="center" width="5%"><a href="index.php?editor=npc&z=<?=get_zone_by_npcid($v['goalid'])?>&zoneid=<?=get_zoneid_by_npcid($v['goalid'])?>&npcid=<?=$v['goalid']?>"><?=$v['goalid']?></td>
-<?endif;?>
-<?if($v['activitytype'] == 4 && $v['goalmethod'] == 2):?>
-        <td align="center" width="5%"><?=$v['goalid']?></td>
-<?endif;?>
-<?if(($v['activitytype'] == 3 || $v['activitytype'] == 1 || $v['activitytype'] == 7 || $v['activitytype'] == 8  || $v['activitytype'] == 6) && ($v['goalmethod'] == 0)):?>
-        <td align="center" width="5%"><a href="index.php?editor=items&tskid=<?=$id?>&id=<?=$v['goalid']?>&action=2"><?=$v['goalid']?></a> <span>[<a href="https://lucy.allakhazam.com/item.html?id=<?=$v['goalid']?>" target="_blank">Lucy</a>]</span></td>
-<?endif;?>
-<?if(($v['activitytype'] == 3 || $v['activitytype'] == 1 || $v['activitytype'] == 7 || $v['activitytype'] == 8  || $v['activitytype'] == 6) && ($v['goalmethod'] == 2)):?>
-        <td align="center" width="5%"><?=$v['goalid']?> 
-<?endif;?>
+        <td align="center" width="15%"><?=$v['target_name']?></td>  
+        <td align="center" width="15%"><?=$v['item_list']?></td>
+        <td align="center" width="15%"><?=$v['description_override']?></td>
         <td align="center" width="5%"><?=$rewardmethods[$v['goalmethod']]?></td>
         <td align="center" width="5%"><?=$v['goalcount']?></td>
-<?if($v['delivertonpc'] == 0):?>
-        <td align="center" width="5%"><?=$v['delivertonpc']?></td>
-<?endif;?> 
-<?if($v['delivertonpc'] > 0):?>
-        <td align="center" width="5%"><a href="index.php?editor=npc&z=<?=get_zone_by_npcid($v['delivertonpc'])?>&zoneid=<?=get_zoneid_by_npcid($v['delivertonpc'])?>&npcid=<?=$v['delivertonpc']?>"><?=$v['delivertonpc']?></td>
-<?endif;?>
         <td align="center" width="5%"><?=$yesno[$v['optional']]?></td>
         <td align="right">      
           <a href="index.php?editor=tasks&tskid=<?=$id?>&activityid=<?=$v['activityid']?>&action=6"><img src="images/edit2.gif" border="0" title="Edit Entry"></a>          

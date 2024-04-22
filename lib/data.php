@@ -11,7 +11,7 @@ $genders = array(
  2 => "Neuter"
 );
 
-$bodytypes = array (
+$bodytypes = array(
  0   => 'Object', // Catapults, Tents, Practice Dummies, etc.
  1   => 'Humanoid',
  2   => 'Lycanthrope',
@@ -118,7 +118,7 @@ $bodytypes = array (
  103 => 'Property Suicide'
 );
 
-$races = array (
+$races = array(
  0   => 'Doug',
  1   => 'Human',
  2   => 'Barbarian',
@@ -847,7 +847,7 @@ $races = array (
  2250 => 'Interactive Object'
 );
 
-$classes = array (
+$classes = array(
  0  => 'Soldier',
  1  => 'Warrior',
  2  => 'Cleric',
@@ -1055,71 +1055,71 @@ $trade_containers = array(
 );
 
 $world_containers = array(
- 0   => "NONE", //Small Bag
- 1   => "GENERAL", //Large Bag
+ 0   => "SMALLBAG", //Small Bag
+ 1   => "LARGEBAG", //Large Bag
  2   => "QUIVER",
- 3   => "POUCH", //Belt Pouch
- 4   => "GENERAL", //Wrist Pouch
- 5   => "GENERAL", //Backpack
- 6   => "BOX", //Small Chest
- 7   => "PACKAGE", //Large Chest
+ 3   => "BELTPOUCH", //Belt Pouch
+ 4   => "WRISTPOUCH", //Wrist Pouch
+ 5   => "BACKPACK", //Backpack
+ 6   => "SMALLCHEST", //Small Chest
+ 7   => "LARGECHEST", //Large Chest
  8   => "BANDOLIER",
- 9   => "MEDICINEBAG",
- 10  => "TOOLBOX", //Tinkering
- 11  => "RESEARCH", //Lexicon
- 12  => "MORTAR", //Make Poison
- 13  => "SELFDUSTING", //Quest
- 14  => "BOWL", //Mixing
- 15  => "OVEN", //Baking
- 16  => "LOOM", //Tailoring
- 17  => "FORGE", //Blacksmithing
- 18  => "FLETCHINGKIT", //Fletching
- 19  => "BREWBARREL", //Brewing
- 20  => "JEWELERSKIT", //Jewelry Making
- 21  => "POTTERYWHEEL", //Pottery
+ 9   => "MEDICINE",
+ 10  => "TINKERING", //Tinkering
+ 11  => "LEXICON", //Lexicon
+ 12  => "POISONMAKING", //Make Poison
+ 13  => "QUEST", //Quest
+ 14  => "MIXINGBOWL", //Mixing
+ 15  => "BAKING", //Baking
+ 16  => "TAILORING", //Tailoring
+ 17  => "BLACKSMITHING", //Blacksmithing
+ 18  => "FLETCHING", //Fletching
+ 19  => "BREWING", //Brewing
+ 20  => "JEWELRYMAKING", //Jewelry Making
+ 21  => "POTTERY", //Pottery
  22  => "KILN", //Firing
  23  => "KEYMAKER",
- 24  => "WIZARDLEX",
- 25  => "MAGELEX",
- 26  => "NECROLEX",
- 27  => "ENCHLEX",
+ 24  => "RESEARCHWIZ",
+ 25  => "RESEARCHMAG",
+ 26  => "RESEARCHNEC",
+ 27  => "RESEARCHENC",
  28  => "UNKNOWN28",
- 29  => "RESEARCH", //Research Practice
- 30  => "ALWAYSWORKS", //Alchemy
- 31  => "FELWITHEF", //High Elf
- 32  => "TEIRDALFORGE", //Dark Elf
- 33  => "OGGOKFORGE", //Ogre
- 34  => "STORMGUARDF", //Dwarf
- 35  => "AKANONFORGE", //Gnome
- 36  => "NORMANFORGE", //Barbarian
- 37  => "UNKNOWN37", //Iksar
- 38  => "CABILISFORGE", //Human (Freeport)
- 39  => "ANTONICANF", //Human (Qeynos)
- 40  => "ANTONICANF", //Halfling Tailor
- 41  => "VALELOOM", //Halfling Tailor (Vale)
- 42  => "ERUDLOOM", //Erudite
- 43  => "FIERDALLOOM", //Wood Elf
- 44  => "FIERDALFLETCH", //Wood Elf
- 45  => "CABILISWHEEL", //Iksar
- 46  => "TACKLEBOX", //Fishing
- 47  => "GROBBFORGE", //Troll
- 48  => "FIERDALF", //Wood Elf
- 49  => "VALEFORGE", //Halfling
- 50  => "ERUDFORGE", //Erudite
- 51  => "TRADERSATCHEL", //Merchant
- 52  => "UNKNOWN52", //Froglok Forge
- 53  => "AUGMENTSEALER",
+ 29  => "RESEARCHPRACTICE", //Research Practice
+ 30  => "ALCHEMY", //Alchemy
+ 31  => "HIGHELFFORGE", //High Elf
+ 32  => "DARKELFFORGE", //Dark Elf
+ 33  => "OGREFORGE", //Ogre
+ 34  => "DWARFFORGE", //Dwarf
+ 35  => "GNOMEFORGE", //Gnome
+ 36  => "BARBARIANFORGE", //Barbarian
+ 37  => "IKSARFORGE", //Iksar
+ 38  => "HUMANFORGEONE", //Human (Freeport)
+ 39  => "HUMANFORGETWO", //Human (Qeynos)
+ 40  => "HALFLINGTAILORINGONE", //Halfling Tailor
+ 41  => "HALFLINGTAILORINGTWO", //Halfling Tailor (Vale)
+ 42  => "ERUDITETAILORING", //Erudite
+ 43  => "WOODELFTAILORING", //Wood Elf
+ 44  => "WOODELFFLETCHING", //Wood Elf
+ 45  => "IKSARPOTTERY", //Iksar
+ 46  => "FISHING", //Fishing
+ 47  => "TROLLFORGE", //Troll
+ 48  => "WOODELFFORGE", //Wood Elf
+ 49  => "HALFLINGFORGE", //Halfling
+ 50  => "ERUDITEFORGE", //Erudite
+ 51  => "MERCHANT", //Merchant
+ 52  => "FROGLOKFORGE", //Froglok Forge
+ 53  => "AUGMENTER",
  54  => "CHURN",
- 55  => "ORNAMENTATION", //Transformation Mold
- 56  => "ORNAMENTSTRIPPING", //Detransformation Mold
- 57  => "UNKNOWN57", //Unattuner
- 58  => "UNKNOWN58", //Tradeskill Bag, Extraplanar Trade Satchel
- 59  => "UNKNOWN59", //Collectible Bag
- 60  => "UNKNOWN60", //No Deposit
+ 55  => "TRANSFORMATIONMOLD", //Transformation Mold
+ 56  => "DETRANSFORMATIONMOLD", //Detransformation Mold
+ 57  => "UNATTUNER", //Unattuner
+ 58  => "TRADESKILLBAG", //Tradeskill Bag, Extraplanar Trade Satchel
+ 59  => "COLLECTIBLEBAG", //Collectible Bag
+ 60  => "NODEPOSIT", //No Deposit
  255 => "TAANAN?"
 );
 
-$skilltypes = array (
+$skilltypes = array(
 -1  => 'None',
  0  => '1H Blunt',
  1  => '1H Slashing',
@@ -1162,12 +1162,12 @@ $skilltypes = array (
  38 => 'Round Kick',
  39 => 'Safe Fall',
  40 => 'Sense Heading',
- 41 => 'Sing',
+ 41 => 'Singing',
  42 => 'Sneak',
  43 => 'Specialize Abjure',
  44 => 'Specialize Alteration',
  45 => 'Specialize Conjuration',
- 46 => 'Specialize Divinatation',
+ 46 => 'Specialize Divination',
  47 => 'Specialize Evocation',
  48 => 'Pick Pockets',
  49 => 'Stringed Instruments',
@@ -1227,7 +1227,8 @@ $itemmaterial= array(
  22 => "Ry`Gorr",
  23 => "Kael/Guardian",
  24 => "Velious Monk",
- 50 => "VS Commoner"
+ 50 => "VS Commoner",
+240 => "Velious Helm"
 );
 
 $itemtypes= array(
@@ -1236,14 +1237,14 @@ $itemtypes= array(
  2  => "Piercing",
  3  => "1H Blunt",
  4  => "2H Blunt",
- 5  => "Archery",
+ 5  => "Archery", // Bow
  6  => "Crossbow",
- 7  => "Throwing v1",
+ 7  => "Throwing v1", // Thrown
  8  => "Shield",
  9  => "Spell",
- 10 => "Armor", //Defense
- 11 => "Miscellaneous", //Involves Tradeskills
- 12 => "Lockpicks",
+ 10 => "Armor", // Defense
+ 11 => "Miscellaneous", // Misc *(Involves Tradeskills)
+ 12 => "Lockpicks", // Lock Picks
  13 => "Fist",
  14 => "Food",
  15 => "Drink",
@@ -1251,32 +1252,32 @@ $itemtypes= array(
  17 => "Combinable",
  18 => "Bandages",
  19 => "Ammo",
- 20 => "Scroll",
+ 20 => "Scroll", // Spell
  21 => "Potion",
  22 => "Skill", //Fletched Arrow?
  23 => "Wind Instrument",
- 24 => "Stringed Instrument",
+ 24 => "Stringed Instrument", // String Instrument
  25 => "Brass Instrument",
  26 => "Percussion Instrument",
  27 => "Arrow", //Bow Ammo
  28 => "Bolt", //Crossbow Ammo
  29 => "Jewlery",
- 30 => "Artifact",
+ 30 => "Artifact", // Skull
  31 => "Book",
  32 => "Note",
  33 => "Key",
- 34 => "Ticket", //Odd Item
+ 34 => "Ticket", // Coin
  35 => "2H Piercing",
  36 => "Fishing Pole",
  37 => "Fishing Bait",
  38 => "Alcohol",
- 39 => "House Key",
+ 39 => "House Key", // Key v2
  40 => "Compass",
  41 => "Metal Key",
  42 => "Poison",
  43 => "Magic Arrow",
  44 => "Magic Bolt",
- 45 => "Hand to Hand",
+ 45 => "Hand to Hand", // Martial
  46 => "Item Has Effect", //Bazaar Search Only
  47 => "Haste Item", //Bazaar Search Only
  48 => "Item Has FT", //Bazaar Search Only
@@ -1284,27 +1285,28 @@ $itemtypes= array(
  50 => "Singing Instrument",
  51 => "All Instruments",
  52 => "Charm",
- 53 => "Dye",
- 54 => "Augment",
- 55 => "Augment Destroy Solvent",
- 56 => "Augment Remove Solvent",
+ 53 => "Dye", // Armor Dye
+ 54 => "Augment", // Augmentation
+ 55 => "Augment Destroy Solvent", // Aug Solvent
+ 56 => "Augment Remove Solvent", // Aug Distiller
  57 => "Alternate Ability",
  58 => "Guild Banner Kit",
  59 => "Guild Banner Modify Token",
  60 => "Recipe Book",
  61 => "Voluntary Spellcast Book",
  62 => "Auto Spellcast Book",
- 63 => "Point Currency",
- 64 => "Universal Augment Solvent",
+ 63 => "Point Currency", // Alt Currency
+ 64 => "Universal Augment Solvent", // Perfected Distiller
  65 => "Placeable", //Bazaar Search Only
  66 => "Collectible", //Bazaar Search Only
  67 => "Container", //Bazaar Search Only
  68 => "Mount",
  69 => "Illusion",
- 70 => "Familiar"
+ 70 => "Familiar",
+ 255 => "None"
 );
 
-$itemsaugrestrict = array (
+$itemsaugrestrict = array(
  0  => "None",
  1  => "Armor Only",
  2  => "Weapons Only",
@@ -1322,7 +1324,7 @@ $itemsaugrestrict = array (
  14 => "1H Slash, 1H Blunt, or Hand to Hand Only"
 );
 
-$deities = array (
+$deities = array(
  201 => "Bertoxxulous",
  202 => "Brell Serilis",
  203 => "Cazic-Thule",
@@ -1342,13 +1344,13 @@ $deities = array (
  396 => "Agnostic"
 );
 
-$anonymity = array (
+$anonymity = array(
  0 => "No",
  1 => "Anonymous",
  2 => "Roleplay"
 );
 
-$zoneids = array (
+$zoneids = array(
  0   => 'NONE',
  1   => 'qeynos',
  2   => 'qeynos2',
@@ -1803,6 +1805,50 @@ $zoneids = array (
  493 => 'weddingchapel',
  494 => 'weddingchapeldark',
  495 => 'dragoncrypt',
+/*
+ 502^North Qeynos^0^0
+ 503^Firiona Vie^0^0
+ 504^The Spell of the Undead^0^0
+ 505^The Castle of Mistmoore^0^0
+ 506^Kithicor Forest^0^0
+ 507^Kithicor Forest^0^0
+ 508^Veeshan's Peak^0^0
+ 510^Reinforced Clan Crushbone^0^0
+ 512^Rejuvenating Plains of Karana^0^0
+ 513^The Northern Plains of Karana^0^0
+ 515^The Graveyard of the Dead^0^0
+ 517^Reinforced Blackburrow^0^0
+ 518^The Invaded Lair of the Splitpaw^0^0
+ 525^Nektulos Forest^0^0
+ 526^The Plane of Mischief^0^0
+ 530^Everfrost- Unseasonably Warm^0^0
+ 531^Everfrost Peaks^0^0
+ 534^The Feast of Tishe Virm^0^0
+ 537^The Oasis of Marr^0^0
+ 539^The Hole^0^0
+ 548^Accursed Temple of Cazic-Thule^0^0
+ 549^Reinforced Temple of Cazic-Thule^0^0
+ 550^The Nightfall Haunting^0^0
+ 551^The Rathe Mountains^0^0
+ 557^The Lesser Faydark^0^0
+ 563^The Reinforced Estate of Unrest^0^0
+ 566^The Reinforced Ruins of Old Guk^0^0
+ 569^The Ocean of Tears^0^0
+ 572^The Plane of Fear^0^0
+ 576^The Testing Grounds^0^0
+ 581^The Temple of Droga^0^0
+ 586^The Plane of Hate^0^0
+ 596^Timorous Deep^0^0
+ 598^Erud's Crossing^0^0
+ 607^The Mines of Nurga^0^0
+ 615^The City of Thurgadin^0^0
+ 616^Eastern Wastes^0^0
+ 618^The Great Divide^0^0
+ 626^The Plane of Mischief^0^0
+ 628^The Sleeper's Tomb^0^0
+ 629^Icewell Keep^0^0
+ 666^Hollowshade Moor^0^0
+*/
  700 => 'feerrott2',
  701 => 'thulehouse1',
  702 => 'thulehouse2',
@@ -1824,6 +1870,10 @@ $zoneids = array (
  718 => 'phinterior1a2',
  719 => 'phinterior1a3',
  720 => 'phinterior1b1',
+/*
+ 721^One Room House Interior^0^0
+ 722^One Room House Interior^0^0
+*/
  723 => 'phinterior1d1',
  724 => 'argath',
  725 => 'arelis',
@@ -1888,49 +1938,139 @@ $zoneids = array (
  784 => 'degmar',
  785 => 'tempesttemple',
  786 => 'plhpirateshipint',
+ 787 => 'gnomemtn',
+ 788 => 'drogab',
+ 789 => 'charasisb',
+ 790 => 'scorchedwoods',
+ 791 => 'frontiermtnsb',
+ 792 => 'gorowyn',
+ 793 => 'korshaext',
+ 794 => 'lceanium',
+ 795 => 'cosul',
+ 796 => 'codecayb',
+ 797 => 'exaltedb',
+ 798 => 'pohealth',
+ 799 => 'korshaint',
+ 800 => 'chardoktwo',
+/*
+ 801^The Sleeper's Tomb^0^0
+ 802^Kerafyrm's Lair^0^0
+ 803^Skyshrine^0^0
+ 804^Permafrost Keep^0^0
+ 805^Reinforced Permafrost Keep^0^0
+ 806^Gukta, Outpost of Marr^0^0
+ 807^Innothule Swamp^0^0
+ 808^Neriak - Foreign Quarter^0^0
+ 809^Grimling Forest^0^0
+ 810^The Reinforced Castle of Mistmoore^0^0
+ 811^Reinforced Nagafen's Lair^0^0
+ 812^The Reinforced Ruins of Sebilis^0^0
+*/
+ 813 => 'charasistwo',
+ 814 => 'skyfiretwo',
+ 815 => 'overtheretwo',
+ 816 => 'veeshantwo',
+ 817 => 'trialsofsmoke',
+ 818 => 'stratos',
+ 819 => 'aalishai',
+ 820 => 'empyr',
+ 821 => 'esianti',
+ 822 => 'mearatas',
+ 823 => 'chamberoftears',
+ 824 => 'eastwastestwo',
+ 825 => 'frozenshadowtwo',
+ 826 => 'crystaltwoa',
+ 827 => 'greatdividetwo',
+ 828 => 'velketortwo',
+ 829 => 'kaeltwo',
+ 830 => 'crystaltwob',
+ 831 => 'sleepertwo',
+ 832 => 'necropolistwo',
+ 833 => 'cobaltscartwo',
+ 834 => 'westwastestwo',
+ 835 => 'skyshrinetwo',
+ 836 => 'templeveeshantwo',
+/*
+837^Winter^0^0
+838^Anniversary^0^0
+839^Spring^0^0
+840^Autumn^0^0
+841^Frostfell^0^0
+842^April Fools^0^0
+*/
+ 843 => 'maidentwo',
+ 844 => 'umbraltwo',
+ 845 => 'akhevatwo',
+ 846 => 'vexthaltwo',
+ 847 => 'shadowvalley',
+ 848 => 'basilica',
+ 849 => 'bloodfalls',
+ 850 => 'maidenhouseint',
+ 851 => 'shadowhaventwo',
+ 852 => 'sharvahltwo',
+ 853 => 'paludaltwo',
+ 854 => 'shadeweavertwo',
+ 855 => 'darklightcaverns',
+ 856 => 'deepshade',
+ 857 => 'firefallpass',
+ 858 => 'hollowshadetwo',
+/*
+Ankexfen Keep=ankexfen
+Laurion's Inn=laurioninn
+Moors of Nokk=moorsofnokk
+Pal'Lomen=pallomen
+The Hero's Forge=herosforge
+Timorous Falls=timorousfalls
+Unkempt Woods=unkemptwoods
+*/
+/*
+ 904^Qeynos Hills^0^0
+*/
  996 => 'arttest',
+/*
+ 997^CODE PH solo^0^0
+*/
  998 => 'fhalls',
  999 => 'apprentice'
 );
 
-$eqexpansions = array (
- 0  => 'None Selected',
- 1  => 'Original EverQuest',
- 2  => 'Ruins of Kunark',
- 3  => 'Scars of Velious',
- 4  => 'Shadows of Luclin',
- 5  => 'Planes of Power',
- 6  => 'Legacy of Ykesha',
- 7  => 'Lost Dungeons of Norrath',
- 8  => 'Gates of Discord',
- 9  => 'Omens of War',
- 10 => 'Dragons of Norrath',
- 11 => 'Depths of Darkhollow',
- 12 => 'Prophecy of Ro',
- 13 => 'The Serpents Spine',
- 14 => 'The Buried Sea',
- 15 => 'Secrets of Faydwer',
- 16 => 'Seeds of Destruction',
- 17 => 'Underfoot',
- 18 => 'House of Thule',
- 19 => 'Veil of Alaris',
- 20 => 'Rain of Fear',
- 21 => 'Call of the Forsaken',
- 22 => 'The Darkened Sea',
- 23 => 'The Broken Mirror',
- 24 => 'Empires of Kunark',
- 25 => 'Ring of Scale',
+$eqexpansions = array(
+ -1 => 'All',
+  0 => 'Original EverQuest',
+  1 => 'Ruins of Kunark',
+  2 => 'Scars of Velious',
+  3 => 'Shadows of Luclin',
+  4 => 'Planes of Power',
+  5 => 'Legacy of Ykesha',
+  6 => 'Lost Dungeons of Norrath',
+  7 => 'Gates of Discord',
+  8 => 'Omens of War',
+  9 => 'Dragons of Norrath',
+ 10 => 'Depths of Darkhollow',
+ 11 => 'Prophecy of Ro',
+ 12 => 'The Serpents Spine',
+ 13 => 'The Buried Sea',
+ 14 => 'Secrets of Faydwer',
+ 15 => 'Seeds of Destruction',
+ 16 => 'Underfoot',
+ 17 => 'House of Thule',
+ 18 => 'Veil of Alaris',
+ 19 => 'Rain of Fear',
+ 20 => 'Call of the Forsaken',
+ 21 => 'The Darkened Sea',
+ 22 => 'The Broken Mirror',
+ 23 => 'Empires of Kunark',
+ 24 => 'Ring of Scale',
+ 25 => 'The Burning Lands',
+ 26 => 'Torment of Velious',
+ 27 => 'Claws of Veeshan',
+ 28 => 'Terror of Luclin',
+ 29 => 'Night of Shadows',
+ 30 => 'Laurion\'s Song',
  99 => 'Other'
 );
 
-$permissions = array (
- 0 => "Banker Only",
- 1 => "Single Member",
- 2 => "Public if Usable",
- 3 => "Public"
-);
-
-$langtypes = array (
+$langtypes = array(
   0 => "Common Tongue",
   1 => "Barbarian",
   2 => "Erudian",
@@ -1961,4 +2101,109 @@ $langtypes = array (
  27 => "UNK"
 );
 
+$expansions2_long = array(
+-1  => 'All Expansions',
+ 0  => 'Classic Everquest',
+ 1  => 'Ruins of Kunark',
+ 2  => 'Scars of Velious',
+ 3  => 'Shadows of Luclin',
+ 4  => 'Planes of Power',
+ 5  => 'Legacy of Ykesha',
+ 6  => 'Lost Dungeons of Norrath',
+ 7  => 'Gates of Discord',
+ 8  => 'Omens of War',
+ 9  => 'Dragons of Norrath',
+ 10 => 'Depths of Darkhollow',
+ 11 => 'Prophecy of Ro',
+ 12 => 'The Serpents Spine',
+ 13 => 'The Buried Sea',
+ 14 => 'Secrets of Faydwer',
+ 15 => 'Seeds of Destruction',
+ 16 => 'Underfoot',
+ 17 => 'House of Thule',
+ 18 => 'Veil of Alaris',
+ 19 => 'Rain of Fear',
+ 20 => 'Call of the Forsaken',
+ 21 => 'The Darkened Sea',
+ 22 => 'The Broken Mirror',
+ 23 => 'Empires of Kunark',
+ 24 => 'Ring of Scale',
+ 25 => 'The Burning Lands',
+ 26 => 'Torment of Velious',
+ 27 => 'Claws of Veeshan',
+ 28 => 'Terror of Luclin',
+ 29 => 'Night of Shadows',
+ 30 => 'Laurion\'s Song'
+);
+
+$expansions2_short = array(
+-1  => 'All',
+ 0  => 'EQ',
+ 1  => 'RoK',
+ 2  => 'SoV',
+ 3  => 'SoL',
+ 4  => 'PoP',
+ 5  => 'LoY',
+ 6  => 'LDoN',
+ 7  => 'GoD',
+ 8  => 'OoW',
+ 9  => 'DoN',
+ 10 => 'DoD',
+ 11 => 'PoR',
+ 12 => 'TSS',
+ 13 => 'TBS',
+ 14 => 'SoF',
+ 15 => 'SoD',
+ 16 => 'UF',
+ 17 => 'HoT',
+ 18 => 'VoA',
+ 19 => 'RoF',
+ 20 => 'CotF',
+ 21 => 'TDS',
+ 22 => 'TBM',
+ 23 => 'EoK',
+ 24 => 'RoS',
+ 25 => 'TBL',
+ 26 => 'ToV',
+ 27 => 'CoV',
+ 28 => 'ToL',
+ 29 => 'NoS',
+ 30 => 'LS'
+);
+
+$clients = array(
+ 0 => 'Unknown',
+ 1 => 'Client62',
+ 2 => 'Titanium',
+ 3 => 'SoF',
+ 4 => 'SoD',
+ 5 => 'UF',
+ 6 => 'RoF',
+ 7 => 'RoF2'
+);
+
+$spelltypes = array(
+  1   => "Nuke",
+  2   => "Heal",
+  4   => "Root",
+  8   => "Buff",
+  16  => "Escape",
+  32  => "Pet",
+  64  => "Lifetap",
+  128 => "Snare",
+  256 => "DOT",
+  512 => "Dispel",
+  1024 => "In-Combat Buff",
+  2048 => "Mez",
+  4096 => "Charm",
+  8192 => "Slow",
+  16384 => "Debuff",
+  32768 => "Cure",
+  65536 => "Resurrect",
+  131072 => "Hate Redux",
+  262144 => "In Combat Buff Song",
+  524288 => "Out of Combat Buff Song",
+  1048576 => "Pre-Combat Buff",
+  2097152 => "Pre-Combat Buff Song"
+);
 ?>

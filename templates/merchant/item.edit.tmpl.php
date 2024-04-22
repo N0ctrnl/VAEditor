@@ -34,13 +34,25 @@
                 <input id="level_required" type="text" size="10" name="level_required" value="<?=$level_required?>">
               </td>
               <td>
+                <strong>Min Status:</strong><br>
+                <input id="min_status" type="text" size="10" name="min_status" value="<?=$min_status?>">
+              </td>
+              <td>
+                <strong>Max Status:</strong><br>
+                <input id="max_status" type="text" size="10" name="max_status" value="<?=$max_status?>">
+              </td>
+              <td>
                 <strong>Alt Currency Cost:</strong><br>
                 <input id="alt_currency_cost" type="text" size="10" name="alt_currency_cost" value="<?=$alt_currency_cost?>">
               </td>
+            </tr>
+            <tr>
               <td>
                 <strong>Probability:</strong><br>
                 <input id="probability" type="text" size="10" name="probability" value="<?=$probability?>">
               </td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
               <td>&nbsp;</td>
             </tr>
             <tr>
@@ -94,6 +106,33 @@
                     </tr>
                     <tr>
                       <td colspan="8" align="center"><br><input type="checkbox" id="all_classes" onChange="all_boxes_changed('classes_required[]', 'all_classes');"<?echo ($classes_required == 65535) ? " checked" : "";?>>All Classes</td>
+                    </tr>
+                  </table>
+                </fieldset>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4">
+                <fieldset>
+                  <legend><strong>Bucket</strong></legend>
+                  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td>
+                        <strong>Name:</strong><br>
+                        <input type="text" size="20" name="bucket_name" value="<?=$bucket_name?>">
+                      </td>
+                      <td>
+                        <strong>Value:</strong><br>
+                        <input type="text" size="20" name="bucket_value" value="<?=$bucket_value?>">
+                      </td>
+                      <td>
+                        <strong>Comparison:</strong><br>
+                        <select name="bucket_comparison">
+<?foreach ($comparison as $k=>$v):?>
+                          <option value="<?=$k?>"<?echo ($k == $bucket_comparison) ? " selected" : "";?>><?=$k?>: <?=$v?></option>
+<?endforeach;?>
+                        </select>
+                      </td>
                     </tr>
                   </table>
                 </fieldset><br>

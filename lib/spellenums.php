@@ -47,8 +47,8 @@ $sp_buffformulas = array(
     13   => "UNK Duration (13)",
     14   => "UNK Duration (14)",
     15   => "UNK Duration (15)",
-    50   => "72000 (5 Days)",
-    51   => "Permabuff",
+    50   => "Permanent",
+    51   => "Aura",
     3600 => "Duration if not 0, else 3600"
 );
 
@@ -1261,8 +1261,8 @@ $sp_fields = array(
     "pvpresistcalc",        //PVP_RESIST_PER_LEVEL
     "pvpresistcap",         //PVP_RESIST_CAP
     "spell_category",       //GLOBAL_GROUP
-    "field181",             //PVP_DURATION
-    "field182",             //PVP_DURATION_CAP
+    "pvp_duration",         //PVP_DURATION
+    "pvp_duration_cap",     //PVP_DURATION_CAP
     "pcnpc_only_flag",      //PCNPC_ONLY_FLAG
     "cast_not_standing",    //CAST_NOT_STANDING
     "can_mgb",              //CAN_MGB

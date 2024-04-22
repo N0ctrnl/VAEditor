@@ -52,6 +52,14 @@ switch ($action) {
           }
         }
       }
+      $duplicate = check_duplicate_tradeskill_entries($rec);
+      if ($duplicate) {
+        array_push($errors, "This recipe has duplicate item entries ($duplicate). <a href='index.php?editor=tradeskill&ts=$ts&rec=$rec&item_id=$duplicate&action=15'>-=MERGE=-</a>");
+      }
+      $salvage = check_salvage_redundancy($rec);
+      if ($salvage) {
+        array_push($errors, "This recipe will return extra items on fail ($salvage).");
+      }
       $body->set("errors", $errors);
     }
     else {
@@ -186,6 +194,14 @@ switch ($action) {
     $return_address = $_SERVER['HTTP_REFERER'];
     header("Location: $return_address");
     exit;
+  case 15: // Merge Duplicate Entries
+    check_authorization();
+    $tradeskill = $_GET['ts'];
+    $recipe_id = $_GET['rec'];
+    $item_id = $_GET['item_id'];
+    merge_duplicate_tradeskill_entries($recipe_id, $item_id);
+    header("Location: index.php?editor=tradeskill&ts=$tradeskill&rec=$recipe_id&action=0");
+    exit();
 }
 
 function getRecipeTradeskill() {
@@ -193,6 +209,7 @@ function getRecipeTradeskill() {
   
   $query = "SELECT tradeskill FROM tradeskill_recipe WHERE id=$rec";
   $result = $mysql_content_db->query_assoc($query);
+
   return $result['tradeskill'];
 }
 
@@ -213,12 +230,22 @@ function recipe_info() {
   $results = $mysql_content_db->query_mult_assoc($query);
   
   if ($results != '') {
-    foreach($results as $r) {
-      if (isset($world_containers[$r['item_id']])) $r['name'] = $world_containers[$r['item_id']];
-      else $r['name'] = get_item_name($r['item_id']);
-      if ($r['iscontainer'] == 1) $array['containers'][] = $r;
-      elseif ($r['successcount'] > 0) $array['products'][] = $r;
-      else $array['components'][] = $r;
+    foreach ($results as $r) {
+      if (isset($world_containers[$r['item_id']])) {
+        $r['name'] = $world_containers[$r['item_id']];
+      }
+      else {
+        $r['name'] = get_item_name($r['item_id']);
+      }
+      if ($r['iscontainer'] == 1) {
+        $array['containers'][] = $r;
+      }
+      if ($r['successcount'] > 0) {
+        $array['products'][] = $r;
+      }
+      if ($r['failcount'] > 0 || $r['componentcount'] > 0 || $r['salvagecount'] > 0) {
+        $array['components'][] = $r;
+      }
     }
   }
   return $array;
@@ -237,6 +264,7 @@ function update_recipe() {
   $replace_container = $_POST['replace_container'];
   $notes = $_POST['notes'];
   $must_learn = $_POST['must_learn'];
+  $learned_by_item_id = $_POST['learned_by_item_id'];
   $quest = $_POST['quest'];
   $enabled = $_POST['enabled'];
   $min_expansion = $_POST['min_expansion'];
@@ -255,6 +283,7 @@ function update_recipe() {
   if ($old['replace_container'] != $replace_container) $fields .= "replace_container=$replace_container, ";
   if ($old['notes'] != $notes) $fields .= "notes=\"$notes\", ";
   if ($old['must_learn'] != $must_learn) $fields .= "must_learn=\"$must_learn\", ";
+  if ($old['learned_by_item_id'] != $learned_by_item_id) $fields .= "learned_by_item_id=\"$learned_by_item_id\", ";
   if ($old['quest'] != $quest) $fields .= "quest=\"$quest\", ";
   if ($old['enabled'] != $enabled) $fields .= "enabled=\"$enabled\", ";
   if ($old['min_expansion'] != $min_expansion) $fields .= "min_expansion=$min_expansion, ";
@@ -413,6 +442,7 @@ function add_recipe() {
   $replace_container = $_POST['replace_container'];
   $notes = $_POST['notes'];
   $must_learn = $_POST['must_learn'];
+  $learned_by_item_id = $_POST['learned_by_item_id'];
   $quest = $_POST['quest'];
   $enabled = $_POST['enabled'];
   $min_expansion = $_POST['min_expansion'];
@@ -420,7 +450,7 @@ function add_recipe() {
   $content_flags = $_POST['content_flags'];
   $content_flags_disabled = $_POST['content_flags_disabled'];
 
-  $query = "INSERT INTO tradeskill_recipe SET id=$id, name=\"$name\", tradeskill=$tradeskill, skillneeded=$skillneeded, trivial=$trivial, nofail=$nofail, replace_container=$replace_container, notes=\"$notes\", must_learn=$must_learn, quest=$quest, enabled=$enabled, min_expansion=$min_expansion, max_expansion=$max_expansion, content_flags=NULL, content_flags_disabled=NULL";
+  $query = "INSERT INTO tradeskill_recipe SET id=$id, name=\"$name\", tradeskill=$tradeskill, skillneeded=$skillneeded, trivial=$trivial, nofail=$nofail, replace_container=$replace_container, notes=\"$notes\", must_learn=$must_learn, learned_by_item_id=$learned_by_item_id, quest=$quest, enabled=$enabled, min_expansion=$min_expansion, max_expansion=$max_expansion, content_flags=NULL, content_flags_disabled=NULL";
   $mysql_content_db->query_no_result($query);
 
   if ($content_flags != "") {
@@ -452,6 +482,7 @@ function copy_tradeskill() {
   $replace_container = $oldrecipe['replace_container'];
   $notes = $oldrecipe['notes'];
   $must_learn = $oldrecipe['must_learn'];
+  $learned_by_item_id = $oldrecipe['learned_by_item_id'];
   $quest = $oldrecipe['quest'];
   $enabled = $oldrecipe['enabled'];
   $min_expansion = $oldrecipe['min_expansion'];
@@ -465,7 +496,7 @@ function copy_tradeskill() {
   $query = "DELETE FROM tradeskill_recipe_entries WHERE recipe_id=0";
   $mysql_content_db->query_no_result($query);
 
-  $query = "INSERT INTO tradeskill_recipe (id, name, tradeskill, skillneeded, trivial, nofail, replace_container, notes, must_learn, quest, enabled, min_expansion, max_expansion, content_flags, content_flags_disabled) VALUES ($newid, \"$name\", $tradeskill, $skillneeded, $trivial, $nofail, $replace_container, \"$notes\", $must_learn, $quest, $enabled, $min_expansion, $max_expansion, NULL, NULL)";
+  $query = "INSERT INTO tradeskill_recipe (id, name, tradeskill, skillneeded, trivial, nofail, replace_container, notes, must_learn, learned_by_item_id, quest, enabled, min_expansion, max_expansion, content_flags, content_flags_disabled) VALUES ($newid, \"$name\", $tradeskill, $skillneeded, $trivial, $nofail, $replace_container, \"$notes\", $must_learn, $learned_by_item_id, $quest, $enabled, $min_expansion, $max_expansion, NULL, NULL)";
   $mysql_content_db->query_no_result($query);
 
   if ($content_flags != "") {
@@ -586,5 +617,66 @@ function extract_learn_flags($learn_value) {
   $learn_flags = array("l_method" => $l_method, "l_message" => $l_message, "l_search" => $l_search);
 
   return $learn_flags;
+}
+
+function check_duplicate_tradeskill_entries($recipe_id) {
+  global $mysql_content_db;
+
+  $query = "SELECT recipe_id, item_id FROM tradeskill_recipe_entries WHERE recipe_id=$recipe_id GROUP BY item_id HAVING COUNT(item_id) > 1 LIMIT 1";
+  $result = $mysql_content_db->query_assoc($query);
+
+  if ($result) {
+    return $result['item_id'];
+  }
+  else {
+    return null;
+  }
+}
+
+function merge_duplicate_tradeskill_entries($recipe_id, $item_id) {
+  global $mysql_content_db;
+
+  $success = 0;
+  $fail = 0;
+  $component = 0;
+  $salvage = 0;
+  $entry_ids = array();
+
+  $query = "SELECT * FROM tradeskill_recipe_entries WHERE recipe_id=$recipe_id AND item_id=$item_id";
+  $results = $mysql_content_db->query_mult_assoc($query);
+
+  foreach ($results as $result) {
+    if ($result['iscontainer']) {
+      return;
+    }
+    array_push($entry_ids, $result['id']);
+    $success += $result['successcount'];
+    $fail += $result['failcount'];
+    $component += $result['componentcount'];
+    $salvage += $result['salvagecount'];
+  }
+
+  $id = array_shift($entry_ids);
+  $query = "UPDATE tradeskill_recipe_entries SET successcount=$success, failcount=$fail, componentcount=$component, salvagecount=$salvage WHERE id=$id";
+  $mysql_content_db->query_no_result($query);
+
+  foreach ($entry_ids as $id) {
+    $query = "DELETE FROM tradeskill_recipe_entries WHERE id=$id";
+    $mysql_content_db->query_no_result($query);
+  }
+}
+
+function check_salvage_redundancy($recipe_id) {
+  global $mysql_content_db;
+
+  $query = "SELECT recipe_id, item_id FROM tradeskill_recipe_entries WHERE recipe_id=$recipe_id AND failcount > 0 AND salvagecount > 0 LIMIT 1";
+  $result = $mysql_content_db->query_assoc($query);
+
+  if ($result) {
+    return $result['item_id'];
+  }
+  else {
+    return null;
+  }
 }
 ?>

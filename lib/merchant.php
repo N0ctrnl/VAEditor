@@ -1,5 +1,18 @@
 <?php
 
+$comparison = array(
+ 0 => "==",
+ 1 => "!=",
+ 2 => ">=",
+ 3 => "<=",
+ 4 => ">",
+ 5 => "<",
+ 6 => "is any of",
+ 7 => "is not any of",
+ 8 => "is between",
+ 9 => "is not between"
+);
+
 switch ($action) {
   case 0:  // View Merchantlist
     if ($npcid) {
@@ -31,6 +44,7 @@ switch ($action) {
         $body->set($key, $value);
       }
     }
+    $body->set('comparison', $comparison);
     break;
   case 2: // Update merchant item
     check_authorization();
@@ -55,6 +69,7 @@ switch ($action) {
     if ($slot) {
       $body->set('slot', $slot);
     }
+    $body->set('comparison', $comparison);
     break;
   case 5: // Add item
     check_authorization();
@@ -78,14 +93,17 @@ switch ($action) {
     if (isset($_GET['search']) && $_GET['search'] != "Enter Item ID") {
       $results = search_merchant_by_item();
     }
-    $body->set("results", $results);
+    if (isset($results)) {
+      $body->set("results", $results);
+    }
     break;
-  case 8:  // View Temp Merchanlist
+  case 8:  // View Temp Merchantlist
     if ($npcid) {
       $body = new Template("templates/merchant/merchant_temp.tmpl.php");
       $body->set('currzone', $z);
       $body->set('currzoneid', $zoneid);
       $body->set('npcid', $npcid);
+      $body->set('zoneids', $zoneids);
       $vars = get_merchantlist_temp();
       if ($vars) {
         foreach ($vars as $key=>$value) {
@@ -100,6 +118,7 @@ switch ($action) {
     $body->set('currzone', $z);
     $body->set('currzoneid', $zoneid);
     $body->set('npcid', $npcid);
+    $body->set('zoneids', $zoneids);
     $vars = get_merchantlist_temp();
     if ($vars) {
       foreach ($vars as $key=>$value) {
@@ -124,6 +143,7 @@ switch ($action) {
     $body->set('currzone', $z);
     $body->set('currzoneid', $zoneid);
     $body->set('npcid', $npcid);
+    $body->set('zoneids', $zoneids);
     break;
   case 13: // Add item
     check_authorization();
@@ -183,15 +203,16 @@ function get_merchantlist() {
   if ($results) {
     foreach ($results as $result) {
       $result['item_name'] = 'Item not in DB';
-      $array['slots'][$result['slot']] = array("item"=>$result['item'], "item_name"=>$result['item_name'], "faction_required"=>$result['faction_required'], "level_required"=>$result['level_required'], "alt_currency_cost"=>$result['alt_currency_cost'], "classes_required"=>$result['classes_required'], "probability"=>$result['probability'], "min_expansion"=>$result['min_expansion'], "max_expansion"=>$result['max_expansion'], "content_flags"=>$result['content_flags'], "content_flags_disabled"=>$result['content_flags_disabled']);
+      $array['slots'][$result['slot']] = array("item"=>$result['item'], "item_name"=>$result['item_name'], "faction_required"=>$result['faction_required'], "level_required"=>$result['level_required'], "min_status"=>$result['min_status'], "max_status"=>$result['max_status'], "alt_currency_cost"=>$result['alt_currency_cost'], "classes_required"=>$result['classes_required'], "probability"=>$result['probability'], "bucket_name"=>$result['bucket_name'], "bucket_value"=>$result['bucket_value'], "bucket_comparison"=>$result['bucket_comparison'], "min_expansion"=>$result['min_expansion'], "max_expansion"=>$result['max_expansion'], "content_flags"=>$result['content_flags'], "content_flags_disabled"=>$result['content_flags_disabled']);
     }
   }
-  $query = "SELECT m.merchantid, m.slot, m.item, i.price, i.sellrate, m.faction_required, m.level_required, m.alt_currency_cost, m.classes_required, m.probability, m.min_expansion, m.max_expansion, m.content_flags, m.content_flags_disabled FROM merchantlist AS m, items AS i WHERE i.id=m.item AND merchantid=$mid";
+
+  $query = "SELECT m.merchantid, m.slot, m.item, i.price, i.sellrate, m.faction_required, m.level_required, m.min_status, m.max_status, m.alt_currency_cost, m.classes_required, m.probability, m.bucket_name, m.bucket_value, m.bucket_comparison, m.min_expansion, m.max_expansion, m.content_flags, m.content_flags_disabled FROM merchantlist AS m, items AS i WHERE i.id=m.item AND merchantid=$mid";
   $results = $mysql_content_db->query_mult_assoc($query);
   if ($results) {
       foreach ($results as $result) {
           $result['item_name'] = get_item_name($result['item']);
-          $array['slots'][$result['slot']] = array("item"=>$result['item'], "item_name"=>$result['item_name'], "price"=>$result['price'], "sellrate"=>$result['sellrate'], "faction_required"=>$result['faction_required'], "level_required"=>$result['level_required'], "alt_currency_cost"=>$result['alt_currency_cost'], "classes_required"=>$result['classes_required'], "probability"=>$result['probability'], "min_expansion"=>$result['min_expansion'], "max_expansion"=>$result['max_expansion'], "content_flags"=>$result['content_flags'], "content_flags_disabled"=>$result['content_flags_disabled']);
+          $array['slots'][$result['slot']] = array("item"=>$result['item'], "item_name"=>$result['item_name'], "price"=>$result['price'], "sellrate"=>$result['sellrate'], "faction_required"=>$result['faction_required'], "level_required"=>$result['level_required'], "min_status"=>$result['min_status'], "max_status"=>$result['max_status'], "alt_currency_cost"=>$result['alt_currency_cost'], "classes_required"=>$result['classes_required'], "probability"=>$result['probability'], "bucket_name"=>$result['bucket_name'], "bucket_value"=>$result['bucket_value'], "bucket_comparison"=>$result['bucket_comparison'], "min_expansion"=>$result['min_expansion'], "max_expansion"=>$result['max_expansion'], "content_flags"=>$result['content_flags'], "content_flags_disabled"=>$result['content_flags_disabled']);
         }
   }
 
@@ -199,25 +220,24 @@ function get_merchantlist() {
 }
 
 function get_merchantlist_temp() {
-  global $mysql_content_db;
-  $array = array();
+  global $mysql, $mysql_content_db;
 
+  $array = array();
   $npcid = $_GET['npcid'];
-  $query = "SELECT npcid, slot, itemid, charges FROM merchantlist_temp WHERE npcid=$npcid";
-  $results = $mysql_content_db->query_mult_assoc($query);
-  if ($results) {
-        foreach ($results as $result) {
-      $result['item_name'] = 'Item not in DB';
-          $array['slots'][$result['slot']] = array("itemid"=>$result['itemid'], "charges"=>$result['charges'], "item_name"=>$result['item_name']);
-        }
-  }
-  $query = "SELECT m.npcid, m.slot, m.itemid, m.charges, i.price, i.sellrate FROM merchantlist_temp AS m, items AS i WHERE i.id=m.itemid and npcid=$npcid";
-  $results = $mysql_content_db->query_mult_assoc($query);
-  if ($results) {
-      foreach ($results as $result) {
-    $result['item_name'] = get_item_name($result['itemid']);
-          $array['slots'][$result['slot']] = array("itemid"=>$result['itemid'], "charges"=>$result['charges'], "item_name"=>$result['item_name'], "price"=>$result['price'], "sellrate"=>$result['sellrate']);
+
+  $query = "SELECT slot, zone_id, instance_id, itemid, charges FROM merchantlist_temp WHERE npcid=$npcid";
+  $m_results = $mysql->query_mult_assoc($query);
+  if ($m_results) {
+    foreach ($m_results as $m_result) {
+      $query = "SELECT Name, price, sellrate FROM items WHERE id=" . $m_result['itemid'];
+      $i_result = $mysql_content_db->query_assoc($query);
+      if ($i_result) {
+        $array['slots'][$m_result['slot']] = array("zone_id"=>$m_result['zone_id'], "instance_id"=>$m_result['instance_id'], "itemid"=>$m_result['itemid'], "charges"=>$m_result['charges'], "item_name"=>$i_result['Name'], "price"=>$i_result['price'], "sellrate"=>$i_result['sellrate']);
       }
+      else {
+        $array['slots'][$m_result['slot']] = array("zone_id"=>$m_result['zone_id'], "instance_id"=>$m_result['instance_id'], "itemid"=>$m_result['itemid'], "charges"=>$m_result['charges'], "item_name"=>"Item not in DB", "price"=>0, "sellrate"=>0);
+      }
+    }
   }
 
   return $array;
@@ -232,9 +252,14 @@ function update_merchant_item() {
   $item = $_POST['item'];
   $faction_required = $_POST['faction_required'];
   $level_required = $_POST['level_required'];
+  $min_status = $_POST['min_status'];
+  $max_status = $_POST['max_status'];
   $alt_currency_cost = $_POST['alt_currency_cost'];
   $classes_required = $_POST['classes_required'];
   $probability = $_POST['probability'];
+  $bucket_name = $_POST['bucket_name'];
+  $bucket_value = $_POST['bucket_value'];
+  $bucket_comparison = $_POST['bucket_comparison'];
   $min_expansion = $_POST['min_expansion'];
   $max_expansion = $_POST['max_expansion'];
   $content_flags = $_POST['content_flags'];
@@ -246,7 +271,7 @@ function update_merchant_item() {
     $classes_value = $classes_value ^ $v;
   }
 
-  $query = "UPDATE merchantlist SET slot=$new_slot, item=$item, faction_required=$faction_required, level_required=$level_required, alt_currency_cost=$alt_currency_cost, classes_required=$classes_value, probability=$probability, min_expansion=$min_expansion, max_expansion=$max_expansion, content_flags=NULL, content_flags_disabled=NULL WHERE merchantid=$merchantid AND slot=$slot";
+  $query = "UPDATE merchantlist SET slot=$new_slot, item=$item, faction_required=$faction_required, level_required=$level_required, min_status=$min_status, max_status=$max_status, alt_currency_cost=$alt_currency_cost, classes_required=$classes_value, probability=$probability, bucket_name=\"$bucket_name\", bucket_value=\"$bucket_value\", bucket_comparison=$bucket_comparison, min_expansion=$min_expansion, max_expansion=$max_expansion, content_flags=NULL, content_flags_disabled=NULL WHERE merchantid=$merchantid AND slot=$slot";
   $mysql_content_db->query_no_result($query);
 
   if ($content_flags != "") {
@@ -262,7 +287,7 @@ function update_merchant_item() {
 
 function update_merchantlist_temp() {
   check_authorization();
-  global $mysql_content_db, $npcid;
+  global $mysql, $npcid;
 
   $count = $_POST['count'];
   $oldstats = get_merchantlist_temp();
@@ -270,9 +295,9 @@ function update_merchantlist_temp() {
 
   foreach ($oldstats['slots'] as $slot=>$values) {
     $i++;
-    if (($slot != $_POST["newslot{$i}"]) || ($values['itemid'] != $_POST["itemid{$i}"]) || ($values['charges'] != $_POST["charges{$i}"])) {
-      $query = "UPDATE merchantlist_temp SET itemid=\"" . $_POST["itemid{$i}"] . "\", slot=\"" . $_POST["newslot{$i}"] . "\", charges=\"" . $_POST["charges{$i}"] . "\" WHERE npcid=$npcid AND slot=" . $_POST["slot{$i}"];
-      $mysql_content_db->query_no_result($query);
+    if (($slot != $_POST["newslot{$i}"]) || ($values['zone_id'] != $_POST["zone_id{$i}"]) || ($values['instance_id'] != $_POST["instance_id{$i}"]) || ($values['itemid'] != $_POST["itemid{$i}"]) || ($values['charges'] != $_POST["charges{$i}"])) {
+      $query = "UPDATE merchantlist_temp SET slot=\"" . $_POST["newslot{$i}"] . "\", zone_id=\"" . $_POST["zone_id{$i}"] . "\", instance_id=\"" . $_POST["instance_id{$i}"] . "\", itemid=\"" . $_POST["itemid{$i}"] . "\", charges=\"" . $_POST["charges{$i}"] . "\" WHERE npcid=$npcid AND slot=" . $_POST["slot{$i}"];
+      $mysql->query_no_result($query);
     }
   }
 }
@@ -307,12 +332,15 @@ function delete_ware() {
 
 function delete_temp_ware() {
   check_authorization();
-  global $mysql_content_db, $npcid;
+  global $mysql, $npcid;
+
+  $zone_id = $_GET['zone_id'];
+  $instance_id = $_GET['instance_id'];
   $itemid = $_GET['itemid'];
   $slot = $_GET['slot'];
 
-  $query = "DELETE FROM merchantlist_temp WHERE npcid=$npcid AND slot=$slot AND itemid=$itemid";
-  $mysql_content_db->query_no_result($query);
+  $query = "DELETE FROM merchantlist_temp WHERE npcid=$npcid AND slot=$slot AND zone_id=$zone_id AND instance_id=$instance_id AND itemid=$itemid";
+  $mysql->query_no_result($query);
 }
 
 function add_merchant_item() {
@@ -324,9 +352,14 @@ function add_merchant_item() {
   $item = $_POST['itemid'];
   $faction_required = $_POST['faction_required'];
   $level_required = $_POST['level_required'];
+  $min_status = $_POST['min_status'];
+  $max_status = $_POST['max_status'];
   $alt_currency_cost = $_POST['alt_currency_cost'];
   $classes_required = $_POST['classes_required'];
   $probability = $_POST['probability'];
+  $bucket_name = $_POST['bucket_name'];
+  $bucket_value = $_POST['bucket_value'];
+  $bucket_comparison = $_POST['bucket_comparison'];
   $min_expansion = $_POST['min_expansion'];
   $max_expansion = $_POST['max_expansion'];
   $content_flags = $_POST['content_flags'];
@@ -337,7 +370,7 @@ function add_merchant_item() {
     $classes_value = $classes_value ^ $v;
   }
 
-  $query = "INSERT INTO merchantlist SET merchantid=$mid, slot=$slot, item=$item, faction_required=$faction_required, level_required=$level_required, alt_currency_cost=$alt_currency_cost, classes_required=$classes_value, probability=$probability, min_expansion=$min_expansion, max_expansion=$max_expansion, content_flags=NULL, content_flags_disabled=NULL";
+  $query = "INSERT INTO merchantlist SET merchantid=$mid, slot=$slot, item=$item, faction_required=$faction_required, level_required=$level_required, min_status=$min_status, max_status=$max_status, alt_currency_cost=$alt_currency_cost, classes_required=$classes_value, probability=$probability, bucket_name=\"$bucket_name\", bucket_value=\"$bucket_value\", bucket_comparison=$bucket_comparison, min_expansion=$min_expansion, max_expansion=$max_expansion, content_flags=NULL, content_flags_disabled=NULL";
   $mysql_content_db->query_no_result($query);
 
   if ($content_flags != "") {
@@ -353,9 +386,12 @@ function add_merchant_item() {
 
 function add_merchant_item_temp() {
   check_authorization();
-  global $mysql_content_db, $npcid;
-  $charges = $_POST['charges'];
+  global $mysql, $mysql_content_db, $npcid;
+
+  $zone_id = $_POST['zone_id'];
+  $instance_id = $_POST['instance_id'];
   $itemid = $_POST['itemid'];
+  $charges = $_POST['charges'];
 
   $query = "SELECT merchant_id AS mid FROM npc_types WHERE id=$npcid";
   $result = $mysql_content_db->query_assoc($query);
@@ -366,16 +402,16 @@ function add_merchant_item_temp() {
   $mslot = $result['mslot'] + 1;
 
   $query = "SELECT MAX(slot) AS tslot FROM merchantlist_temp WHERE npcid=$npcid";
-  $result = $mysql_content_db->query_assoc($query);
+  $result = $mysql->query_assoc($query);
   $tslot = $result['tslot'] + 1;
 
   if ($tslot < $mslot) {
-    $query = "INSERT INTO merchantlist_temp SET npcid=$npcid, slot=$mslot, itemid=$itemid, charges=$charges";
-    $mysql_content_db->query_no_result($query);
+    $query = "INSERT INTO merchantlist_temp SET npcid=$npcid, slot=$mslot, zone_id=$zone_id, instance_id=$instance_id, itemid=$itemid, charges=$charges";
+    $mysql->query_no_result($query);
   }
   if ($tslot > $mslot) {
-    $query = "INSERT INTO merchantlist_temp SET npcid=$npcid, slot=$tslot, itemid=$itemid, charges=$charges";
-    $mysql_content_db->query_no_result($query);
+    $query = "INSERT INTO merchantlist_temp SET npcid=$npcid, slot=$tslot, zone_id=$zone_id, instance_id=$instance_id, itemid=$itemid, charges=$charges";
+    $mysql->query_no_result($query);
   }
 }
 
@@ -401,18 +437,18 @@ function delete_merchantlist() {
 
 function delete_merchantlist_temp() {
   check_authorization();
-  global $mysql_content_db, $npcid;
+  global $mysql, $npcid;
 
   $query = "DELETE FROM merchantlist_temp WHERE npcid=$npcid";
-  $mysql_content_db->query_no_result($query);
+  $mysql->query_no_result($query);
 }
 
 function wipe_merchantlist_temp() {
   check_authorization();
-  global $mysql_content_db;
+  global $mysql;
 
   $query = "DELETE FROM merchantlist_temp";
-  $mysql_content_db->query_no_result($query);
+  $mysql->query_no_result($query);
 }
 
 function search_merchant_by_item() {
@@ -427,11 +463,11 @@ function search_merchant_by_item() {
 }
 
 function search_temp_merchant() {
-  global $mysql_content_db;
+  global $mysql;
   $search = $_GET['search1'];
 
   $query = "SELECT npc_types.id, npc_types.name FROM merchantlist_temp INNER JOIN npc_types ON npc_types.id=merchantlist_temp.npcid WHERE merchantlist_temp.slot < 81 and merchantlist_temp.itemid=\"$search\"";
-  $results = $mysql_content_db->query_mult_assoc($query);
+  $results = $mysql->query_mult_assoc($query);
   return $results;
 }
 
@@ -465,7 +501,7 @@ function copy_merchantlist() {
   $query = "DELETE FROM merchantlist WHERE merchantid=0";
   $mysql_content_db->query_no_result($query);
 
-  $query = "INSERT INTO merchantlist (slot, item, faction_required, level_required, alt_currency_cost, classes_required, probability, min_expansion, max_expansion, content_flags, content_flags_disabled) SELECT slot, item, faction_required, level_required, alt_currency_cost, classes_required, probability, min_expansion, max_expansion, content_flags, content_flags_disabled FROM merchantlist WHERE merchantid=$mid";
+  $query = "INSERT INTO merchantlist (slot, item, faction_required, level_required, min_status, max_status, alt_currency_cost, classes_required, probability, bucket_name, bucket_value, bucket_comparison, min_expansion, max_expansion, content_flags, content_flags_disabled) SELECT slot, item, faction_required, level_required, min_status, max_status, alt_currency_cost, classes_required, probability, bucket_name, bucket_value, bucket_comparison, min_expansion, max_expansion, content_flags, content_flags_disabled FROM merchantlist WHERE merchantid=$mid";
   $mysql_content_db->query_no_result($query);
 
   $query = "UPDATE merchantlist SET merchantid=$nmid WHERE merchantid=0";

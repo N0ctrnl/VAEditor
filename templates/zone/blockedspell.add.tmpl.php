@@ -25,9 +25,9 @@
             <td align="left">
               <strong>Type</strong><br>
               <select name="type">
-                <option value="0"<?echo ($type == 0) ? " selected" : ""?>>Not Blocked</option>
-                <option value="1"<?echo ($type == 1) ? " selected" : ""?>>Zone Wide</option>
-                <option value="2"<?echo ($type == 2) ? " selected" : ""?>>Coords</option>
+                <option value="0">Not Blocked</option>
+                <option value="1">Zone Wide</option>
+                <option value="2">Coords</option>
               </select><br><br>
             </td>
           </tr>
@@ -50,6 +50,28 @@
             </td>
           </tr>
           <tr>
+            <td>
+              <strong>Min Expansion</strong><br>
+              <input type="text" name="min_expansion" size="7" value="-1"><br><br>
+            </td>
+            <td>
+              <strong>Max Expansion</strong><br>
+              <input type="text" name="max_expansion" size="7" value="-1"><br><br>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <strong>Content Flags</strong><br>
+              <input type="text" name="content_flags" size="38" value=""><br><br>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <strong>Content Flags Disabled</strong><br>
+              <input type="text" name="content_flags_disabled" size="38" value=""><br><br>
+            </td>
+          </tr>
+          <tr>
             <td align="left" colspan="2">
               <strong>Message</strong><br>
               <textarea name="message" cols="38" rows="3"></textarea><br><br>
@@ -58,7 +80,7 @@
           <tr>
             <td align="left" colspan="2">
               <strong>Description</strong><br>
-              <textarea name="description" cols="38" rows="2"><?=$description?></textarea><br><br>
+              <textarea name="description" cols="38" rows="2"></textarea><br><br>
             </td>
           </tr>
         </table>

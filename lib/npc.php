@@ -128,6 +128,12 @@ $stuck = array(
   3 => 'Evade Combat'
 );
 
+$npc_scaling_types = array(
+  0 => 'Trash',
+  1 => 'Named',
+  2 => 'Raid'
+);
+
 switch ($action) {
   case 0:
     if ($npcid) {  // View NPC
@@ -405,7 +411,7 @@ switch ($action) {
     exit;
   case 27: // Search npcs
     $body = new Template("templates/npc/npc.searchresults.tmpl.php");
-    if (isset($_GET['npcid']) && $_GET['npcid'] != "ID") {
+    if (isset($_GET['npc_id']) && $_GET['npc_id'] != "ID") {
       $results = search_npc_by_id();
     }
     else {
@@ -994,6 +1000,52 @@ switch ($action) {
     delete_beastlord_pet($_GET['player_race']);
     header("Location: index.php?editor=npc&action=84");
     exit;
+  case 89: // View NPC Scaling
+    $breadcrumbs .= " >> NPC Scaling";
+    $body = new Template("templates/npc/npc.scaling.view.tmpl.php");
+    $scaling = get_npc_scaling();
+    if ($scaling) {
+      $body->set('scaling', $scaling);
+      $body->set('npc_scaling_types', $npc_scaling_types);
+    }
+    break;
+  case 90: // Add NPC Scale
+    check_authorization();
+    $javascript = new Template("templates/npc/js.tmpl.php");
+    $breadcrumbs .= " >> <a href='index.php?editor=npc&action=89'>NPC Scaling</a> >> Add Scale";
+    $body = new Template("templates/npc/npc.scale.add.tmpl.php");
+    $body->set('npc_scaling_types', $npc_scaling_types);
+    $body->set('zoneids', $zoneids);
+    break;
+  case 91: // Insert NPC Scale
+    check_authorization();
+    insert_npc_scale();
+    header("Location: index.php?editor=npc&action=89");
+    exit;
+  case 92: // Edit NPC Scale
+    check_authorization();
+    $javascript = new Template("templates/npc/js.tmpl.php");
+    $breadcrumbs .= " >> <a href='index.php?editor=npc&action=89'>NPC Scaling</a> >> Edit Scale";
+    $body = new Template("templates/npc/npc.scale.edit.tmpl.php");
+    $scale = get_npc_scale($_GET['type'], $_GET['level'], $_GET['zone_id_list'], $_GET['instance_version_list']);
+    if ($scale) {
+      $body->set('scale', $scale);
+      $body->set('npc_scaling_types', $npc_scaling_types);
+      $body->set('zoneids', $zoneids);
+      $body->set('special_abilities_max', $special_abilities_max);
+      $body->set('specialattacks', $specialattacks);
+    }
+    break;
+  case 93: // Update NPC Scale
+    check_authorization();
+    update_npc_scale();
+    header("Location: index.php?editor=npc&action=89");
+    exit;
+  case 94: // Delete NPC Scale
+    check_authorization();
+    delete_npc_scale($_GET['type'], $_GET['level'], $_GET['zone_id_list'], $_GET['instance_version_list']);
+    header("Location: index.php?editor=npc&action=89");
+    exit;
 }
 
 function npc_info() {
@@ -1350,6 +1402,7 @@ function update_npc() {
   if ($herosforgemodel != $_POST['herosforgemodel']) $fields .= "herosforgemodel=\"" . $_POST['herosforgemodel'] . "\", ";
   if ($size != $_POST['size']) $fields .= "size=\"" . $_POST['size'] . "\", ";
   if ($hp_regen_rate != $_POST['hp_regen_rate']) $fields .= "hp_regen_rate=\"" . $_POST['hp_regen_rate'] . "\", ";
+  if ($hp_regen_per_second != $_POST['hp_regen_per_second']) $fields .= "hp_regen_per_second=\"" . $_POST['hp_regen_per_second'] . "\", ";
   if ($mana_regen_rate != $_POST['mana_regen_rate']) $fields .= "mana_regen_rate=\"" . $_POST['mana_regen_rate'] . "\", ";
   if ($loottable_id != $_POST['loottable_id']) $fields .= "loottable_id=\"" . $_POST['loottable_id'] . "\", ";
   //merchant_id
@@ -1358,7 +1411,7 @@ function update_npc() {
   //npc_spells_effects_id
   //npc_faction_id
   //adventure_template_id
-  //trap_template
+  if ($trap_template != $_POST['trap_template']) $fields .= "trap_template=\"" . $_POST['trap_template'] . "\", ";
   if ($mindmg != $_POST['mindmg']) $fields .= "mindmg=\"" . $_POST['mindmg'] . "\", ";
   if ($maxdmg != $_POST['maxdmg']) $fields .= "maxdmg=\"" . $_POST['maxdmg'] . "\", ";
   if ($attack_count != $_POST['attack_count']) $fields .= "attack_count=\"" . $_POST['attack_count'] . "\", ";
@@ -1442,13 +1495,15 @@ function update_npc() {
   //unique_
   //fixed
   if ($ignore_despawn != $_POST['ignore_despawn']) $fields .= "ignore_despawn=\"" . $_POST['ignore_despawn'] . "\", ";
+  if ($show_name != $_POST['show_name']) $fields .= "show_name=\"" . $_POST['show_name'] . "\", ";
+  //untargetable
   if ($charm_ac != $_POST['charm_ac']) $fields .= "charm_ac=\"" . $_POST['charm_ac'] . "\", ";
   if ($charm_min_dmg != $_POST['charm_min_dmg']) $fields .= "charm_min_dmg=\"" . $_POST['charm_min_dmg'] . "\", ";
   if ($charm_max_dmg != $_POST['charm_max_dmg']) $fields .= "charm_max_dmg=\"" . $_POST['charm_max_dmg'] . "\", ";
-  if ($charm_atk != $_POST['charm_atk']) $fields .= "charm_atk=\"" . $_POST['charm_atk'] . "\", ";
   if ($charm_attack_delay != $_POST['charm_attack_delay']) $fields .= "charm_attack_delay=\"" . $_POST['charm_attack_delay'] . "\", ";
   if ($charm_accuracy_rating != $_POST['charm_accuracy_rating']) $fields .= "charm_accuracy_rating=\"" . $_POST['charm_accuracy_rating'] . "\", ";
   if ($charm_avoidance_rating != $_POST['charm_avoidance_rating']) $fields .= "charm_avoidance_rating=\"" . $_POST['charm_avoidance_rating'] . "\", ";
+  if ($charm_atk != $_POST['charm_atk']) $fields .= "charm_atk=\"" . $_POST['charm_atk'] . "\", ";
   if ($skip_global_loot != $_POST['skip_global_loot']) $fields .= "skip_global_loot=\"" . $_POST['skip_global_loot'] . "\", ";
   if ($rare_spawn != $_POST['rare_spawn']) $fields .= "rare_spawn=\"" . $_POST['rare_spawn'] . "\", ";
   if ($stuck_behavior != $_POST['stuck_behavior']) $fields .= "stuck_behavior=\"" . $_POST['stuck_behavior'] . "\", ";
@@ -1456,6 +1511,9 @@ function update_npc() {
   if ($flymode != $_POST['flymode']) $fields .= "flymode=\"" . $_POST['flymode'] . "\", ";
   if ($always_aggro != $_POST['always_aggro']) $fields .= "always_aggro=\"" . $_POST['always_aggro'] . "\", ";
   if ($exp_mod != $_POST['exp_mod']) $fields .= "exp_mod=\"" . $_POST['exp_mod'] . "\", ";
+  if ($heroic_strikethrough != $_POST['heroic_strikethrough']) $fields .= "heroic_strikethrough=\"" . $_POST['heroic_strikethrough'] . "\", ";
+  if ($faction_amount != $_POST['faction_amount']) $fields .= "faction_amount=\"" . $_POST['faction_amount'] . "\", ";
+  if ($keeps_sold_items != $_POST['keeps_sold_items']) $fields .= "keeps_sold_items=\"" . $_POST['keeps_sold_items'] . "\", ";
 
   $fields =  rtrim($fields, ", ");
 
@@ -1506,6 +1564,7 @@ function add_npc() {
   $fields .= "herosforgemodel=\"" . $_POST['herosforgemodel'] . "\", ";
   $fields .= "size=\"" . $_POST['size'] . "\", ";
   $fields .= "hp_regen_rate=\"" . $_POST['hp_regen_rate'] . "\", ";
+  $fields .= "hp_regen_per_second=\"" . $_POST['hp_regen_per_second'] . "\", ";
   $fields .= "mana_regen_rate=\"" . $_POST['mana_regen_rate'] . "\", ";
   $fields .= "loottable_id=\"" . $_POST['loottable_id'] . "\", ";
   //merchant_id
@@ -1514,7 +1573,7 @@ function add_npc() {
   //npc_spells_effects_id
   //npc_faction_id
   //adventure_template_id
-  //trap_template
+  $fields .= "trap_template=\"" . $_POST['trap_template'] . "\", ";
   $fields .= "mindmg=\"" . $_POST['mindmg'] . "\", ";
   $fields .= "maxdmg=\"" . $_POST['maxdmg'] . "\", ";
   $fields .= "attack_count=\"" . $_POST['attack_count'] . "\", ";
@@ -1598,20 +1657,25 @@ function add_npc() {
   //unique_
   //fixed
   $fields .= "ignore_despawn=\"" . $_POST['ignore_despawn'] . "\", ";
+  $fields .= "show_name=\"" . $_POST['show_name'] . "\", ";
+  //untargetable
   $fields .= "charm_ac=\"" . $_POST['charm_ac'] . "\", ";
   $fields .= "charm_min_dmg=\"" . $_POST['charm_min_dmg'] . "\", ";
   $fields .= "charm_max_dmg=\"" . $_POST['charm_max_dmg'] . "\", ";
-  $fields .= "charm_atk=\"" . $_POST['charm_atk'] . "\", ";
   $fields .= "charm_attack_delay=\"" . $_POST['charm_attack_delay'] . "\", ";
   $fields .= "charm_accuracy_rating=\"" . $_POST['charm_accuracy_rating'] . "\", ";
   $fields .= "charm_avoidance_rating=\"" . $_POST['charm_avoidance_rating'] . "\", ";
+  $fields .= "charm_atk=\"" . $_POST['charm_atk'] . "\", ";
   $fields .= "skip_global_loot=\"" . $_POST['skip_global_loot'] . "\", ";
   $fields .= "rare_spawn=\"" .$_POST['rare_spawn'] . "\", ";
   $fields .= "stuck_behavior=\"" .$_POST['stuck_behavior'] . "\", ";
   $fields .= "model=\"" .$_POST['model'] . "\", ";
   $fields .= "flymode=\"" .$_POST['flymode'] . "\", ";
   $fields .= "always_aggro=\"" .$_POST['always_aggro'] . "\", ";
-  $fields .= "exp_mod=\"" .$_POST['exp_mod'] . "\"";
+  $fields .= "exp_mod=\"" .$_POST['exp_mod'] . "\", ";
+  $fields .= "heroic_strikethrough=\"" .$_POST['heroic_strikethrough'] . "\", ";
+  $fields .= "faction_amount=\"" .$_POST['faction_amount'] . "\", ";
+  $fields .= "keeps_sold_items=\"" .$_POST['keeps_sold_items'] . "\"";
 
   if ($fields != '') {
     $query = "INSERT INTO npc_types SET $fields";
@@ -1641,6 +1705,7 @@ function copy_npc() {
   $fields .= "herosforgemodel=\"" . $_POST['herosforgemodel'] . "\", ";
   $fields .= "size=\"" . $_POST['size'] . "\", ";
   $fields .= "hp_regen_rate=\"" . $_POST['hp_regen_rate'] . "\", ";
+  $fields .= "hp_regen_per_second=\"" . $_POST['hp_regen_per_second'] . "\", ";
   $fields .= "mana_regen_rate=\"" . $_POST['mana_regen_rate'] . "\", ";
   $fields .= "loottable_id=\"" . $_POST['loottable_id'] . "\", ";
   $fields .= "merchant_id=\"" . $_POST['merchant_id'] . "\", ";
@@ -1733,20 +1798,25 @@ function copy_npc() {
   //unique_
   //fixed
   $fields .= "ignore_despawn=\"" . $_POST['ignore_despawn'] . "\", ";
+  $fields .= "show_name=\"" . $_POST['show_name'] . "\", ";
+  //untargetable
   $fields .= "charm_ac=\"" . $_POST['charm_ac'] . "\", ";
   $fields .= "charm_min_dmg=\"" . $_POST['charm_min_dmg'] . "\", ";
   $fields .= "charm_max_dmg=\"" . $_POST['charm_max_dmg'] . "\", ";
-  $fields .= "charm_atk=\"" . $_POST['charm_atk'] . "\", ";
   $fields .= "charm_attack_delay=\"" . $_POST['charm_attack_delay'] . "\", ";
   $fields .= "charm_accuracy_rating=\"" . $_POST['charm_accuracy_rating'] . "\", ";
   $fields .= "charm_avoidance_rating=\"" . $_POST['charm_avoidance_rating'] . "\", ";
+  $fields .= "charm_atk=\"" . $_POST['charm_atk'] . "\", ";
   $fields .= "skip_global_loot=\"" . $_POST['skip_global_loot'] . "\", ";
   $fields .= "rare_spawn=\"" . $_POST['rare_spawn'] . "\", ";
   $fields .= "stuck_behavior=\"" . $_POST['stuck_behavior'] . "\", ";
   $fields .= "model=\"" . $_POST['model'] . "\", ";
   $fields .= "flymode=\"" . $_POST['flymode'] . "\", ";
   $fields .= "always_aggro=\"" . $_POST['always_aggro'] . "\", ";
-  $fields .= "exp_mod=\"" . $_POST['exp_mod'] . "\"";
+  $fields .= "exp_mod=\"" . $_POST['exp_mod'] . "\", ";
+  $fields .= "heroic_strikethrough=\"" . $_POST['heroic_strikethrough'] . "\", ";
+  $fields .= "faction_amount=\"" . $_POST['faction_amount'] . "\", ";
+  $fields .= "keeps_sold_items=\"" . $_POST['keeps_sold_items'] . "\"";
 
   if ($fields != '') {
     $query = "INSERT INTO npc_types SET $fields";
@@ -1921,7 +1991,7 @@ function get_npc_faction_id() {
   return $result['npc_faction_id'];
 }
 
-function update_npc_faction_id ($fid) {
+function update_npc_faction_id($fid) {
   check_authorization();
   global $mysql_content_db, $npcid;
 
@@ -1939,14 +2009,14 @@ function change_faction_byname() {
   $npcname = $_POST['npcname'];
   $updateall = $_POST['updateall'];
  
-  if($updateall == 0){
-  $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE name LIKE \"%$npcname%\" AND id > $min_id AND id < $max_id AND npc_faction_id = 0";
-  $mysql_content_db->query_no_result($query);
+  if ($updateall == 0) {
+    $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE name LIKE \"%$npcname%\" AND id > $min_id AND id < $max_id AND npc_faction_id = 0";
+    $mysql_content_db->query_no_result($query);
   }
 
-  if($updateall == 1){
-  $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE name LIKE \"%$npcname%\" AND id > $min_id AND id < $max_id";
-  $mysql_content_db->query_no_result($query);
+  if ($updateall == 1) {
+    $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE name LIKE \"%$npcname%\" AND id > $min_id AND id < $max_id";
+    $mysql_content_db->query_no_result($query);
   }
 }
 
@@ -1960,14 +2030,14 @@ function change_faction_byrace() {
   $npcrace = $_POST['npcrace'];
   $updateall = $_POST['updateall'];
  
-  if($updateall == 0){
-  $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE race=$npcrace AND id > $min_id AND id < $max_id AND npc_faction_id=0";
-  $mysql_content_db->query_no_result($query);
+  if ($updateall == 0) {
+    $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE race=$npcrace AND id > $min_id AND id < $max_id AND npc_faction_id=0";
+    $mysql_content_db->query_no_result($query);
   }
 
-  if($updateall == 1){
-  $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE race=$npcrace AND id > $min_id AND id < $max_id";
-  $mysql_content_db->query_no_result($query);
+  if ($updateall == 1) {
+    $query = "UPDATE npc_types SET npc_faction_id=$npcfid WHERE race=$npcrace AND id > $min_id AND id < $max_id";
+    $mysql_content_db->query_no_result($query);
   }
 }
 
@@ -2218,6 +2288,9 @@ function delete_npc() {
   global $mysql_content_db, $npcid;
 
   $query = "DELETE FROM npc_types WHERE id=$npcid";
+  $mysql_content_db->query_no_result($query);
+
+  $query = "DELETE FROM spawnentry WHERE npcID=$npcid";
   $mysql_content_db->query_no_result($query);
 }
 
@@ -2671,6 +2744,149 @@ function delete_beastlord_pet($player_race) {
   global $mysql_content_db;
 
   $query = "DELETE FROM pets_beastlord_data WHERE player_race=$player_race";
+  $mysql_content_db->query_no_result($query);
+}
+
+function get_npc_scaling() {
+  global $mysql_content_db;
+
+  $query = "SELECT * FROM npc_scale_global_base ORDER BY type, level, zone_id_list, instance_version_list";
+  $results = $mysql_content_db->query_mult_assoc($query);
+
+  if ($results) {
+    return $results;
+  }
+  else {
+    return null;
+  }
+}
+
+function get_npc_scale($type, $level, $zone_id_list, $instance_version_list) {
+  global $mysql_content_db;
+
+  $query = "SELECT * FROM npc_scale_global_base WHERE type=$type AND level=$level AND zone_id_list=\"$zone_id_list\" AND instance_version_list=\"$instance_version_list\"";
+  $result = $mysql_content_db->query_assoc($query);
+
+  if ($result) {
+    return $result;
+  }
+  else {
+    return null;
+  }
+}
+
+function insert_npc_scale() {
+  global $mysql_content_db, $specialattacks;
+
+  $special = "";
+  foreach ($specialattacks as $k => $v) {
+    if (isset($_POST["$k"])) {
+      if (SUBSTR($_POST["$k"], -1) != '^' && $_POST["$k"] != '') {
+        $_POST["$k"].= '^';
+      }
+      $special .= $_POST["$k"];
+    }
+  }
+  rtrim($special, '^');
+
+  $type = $_POST['type'];
+  $level = $_POST['level'];
+  $zone_id_list = $_POST['zone_id_list'];
+  $instance_version_list = $_POST['instance_version_list'];
+  $ac = $_POST['ac'];
+  $hp = $_POST['hp'];
+  $accuracy = $_POST['accuracy'];
+  $slow_mitigation = $_POST['slow_mitigation'];
+  $attack = $_POST['attack'];
+  $strength = $_POST['strength'];
+  $stamina = $_POST['stamina'];
+  $dexterity = $_POST['dexterity'];
+  $agility = $_POST['agility'];
+  $intelligence = $_POST['intelligence'];
+  $wisdom = $_POST['wisdom'];
+  $charisma = $_POST['charisma'];
+  $magic_resist = $_POST['magic_resist'];
+  $cold_resist = $_POST['cold_resist'];
+  $fire_resist = $_POST['fire_resist'];
+  $poison_resist = $_POST['poison_resist'];
+  $disease_resist = $_POST['disease_resist'];
+  $corruption_resist = $_POST['corruption_resist'];
+  $physical_resist = $_POST['physical_resist'];
+  $min_dmg = $_POST['min_dmg'];
+  $max_dmg = $_POST['max_dmg'];
+  $hp_regen_rate = $_POST['hp_regen_rate'];
+  $hp_regen_per_second = $_POST['hp_regen_per_second'];
+  $attack_delay = $_POST['attack_delay'];
+  $spell_scale = $_POST['spell_scale'];
+  $heal_scale = $_POST['heal_scale'];
+  $avoidance = $_POST['avoidance'];
+  $heroic_strikethrough = $_POST['heroic_strikethrough'];
+  $special_abilities = $special;
+
+  $query = "INSERT INTO npc_scale_global_base SET type=$type, level=$level, zone_id_list=\"$zone_id_list\", instance_version_list=\"$instance_version_list\", ac=$ac, hp=$hp, accuracy=$accuracy, slow_mitigation=$slow_mitigation, attack=$attack, strength=$strength, stamina=$stamina, dexterity=$dexterity, agility=$agility, intelligence=$intelligence, wisdom=$wisdom, charisma=$charisma, magic_resist=$magic_resist, cold_resist=$cold_resist, fire_resist=$fire_resist, poison_resist=$poison_resist, disease_resist=$disease_resist, corruption_resist=$corruption_resist, physical_resist=$physical_resist, min_dmg=$min_dmg, max_dmg=$max_dmg, hp_regen_rate=$hp_regen_rate, hp_regen_per_second=$hp_regen_per_second, attack_delay=$attack_delay, spell_scale=$spell_scale, heal_scale=$heal_scale, avoidance=$avoidance, heroic_strikethrough=$heroic_strikethrough, special_abilities=\"$special_abilities\"";
+  $mysql_content_db->query_no_result($query);
+}
+
+function update_npc_scale() {
+  global $mysql_content_db, $specialattacks;
+
+  $special = "";
+  foreach ($specialattacks as $k=>$v) {
+    if (isset($_POST["$k"])) {
+      if (SUBSTR($_POST["$k"], -1) != '^' && $_POST["$k"] != '') {
+        $_POST["$k"].= '^';
+      }
+      $special .= $_POST["$k"];
+    }
+  }
+  rtrim($special, '^');
+
+  $old_type = $_POST['old_type'];
+  $old_level = $_POST['old_level'];
+  $old_zone_id_list = $_POST['old_zone_id_list'];
+  $old_instance_version_list = $_POST['old_instance_version_list'];
+  $type = $_POST['type'];
+  $level = $_POST['level'];
+  $zone_id_list = $_POST['zone_id_list'];
+  $instance_version_list = $_POST['instance_version_list'];
+  $ac = $_POST['ac'];
+  $hp = $_POST['hp'];
+  $accuracy = $_POST['accuracy'];
+  $slow_mitigation = $_POST['slow_mitigation'];
+  $attack = $_POST['attack'];
+  $strength = $_POST['strength'];
+  $stamina = $_POST['stamina'];
+  $dexterity = $_POST['dexterity'];
+  $agility = $_POST['agility'];
+  $intelligence = $_POST['intelligence'];
+  $wisdom = $_POST['wisdom'];
+  $charisma = $_POST['charisma'];
+  $magic_resist = $_POST['magic_resist'];
+  $cold_resist = $_POST['cold_resist'];
+  $fire_resist = $_POST['fire_resist'];
+  $poison_resist = $_POST['poison_resist'];
+  $disease_resist = $_POST['disease_resist'];
+  $corruption_resist = $_POST['corruption_resist'];
+  $physical_resist = $_POST['physical_resist'];
+  $min_dmg = $_POST['min_dmg'];
+  $max_dmg = $_POST['max_dmg'];
+  $hp_regen_rate = $_POST['hp_regen_rate'];
+  $hp_regen_per_second = $_POST['hp_regen_per_second'];
+  $attack_delay = $_POST['attack_delay'];
+  $spell_scale = $_POST['spell_scale'];
+  $heal_scale = $_POST['heal_scale'];
+  $avoidance = $_POST['avoidance'];
+  $heroic_strikethrough = $_POST['heroic_strikethrough'];
+  $special_abilities = $special;
+
+  $query = "UPDATE npc_scale_global_base SET type=$type, level=$level, zone_id_list=\"$zone_id_list\", instance_version_list=\"$instance_version_list\", ac=$ac, hp=$hp, accuracy=$accuracy, slow_mitigation=$slow_mitigation, attack=$attack, strength=$strength, stamina=$stamina, dexterity=$dexterity, agility=$agility, intelligence=$intelligence, wisdom=$wisdom, charisma=$charisma, magic_resist=$magic_resist, cold_resist=$cold_resist, fire_resist=$fire_resist, poison_resist=$poison_resist, disease_resist=$disease_resist, corruption_resist=$corruption_resist, physical_resist=$physical_resist, min_dmg=$min_dmg, max_dmg=$max_dmg, hp_regen_rate=$hp_regen_rate, hp_regen_per_second=$hp_regen_per_second, attack_delay=$attack_delay, spell_scale=$spell_scale, heal_scale=$heal_scale, avoidance=$avoidance, heroic_strikethrough=$heroic_strikethrough, special_abilities=\"$special_abilities\" WHERE type=$old_type AND level=$old_level AND zone_id_list=$old_zone_id_list AND instance_version_list=$old_instance_version_list";
+  $mysql_content_db->query_no_result($query);
+}
+
+function delete_npc_scale($type, $level, $zone_id_list, $instance_version_list) {
+  global $mysql_content_db;
+
+  $query = "DELETE FROM npc_scale_global_base WHERE type=$type AND level=$level AND zone_id_list=$zone_id_list AND instance_version_list=$instance_version_list";
   $mysql_content_db->query_no_result($query);
 }
 ?>

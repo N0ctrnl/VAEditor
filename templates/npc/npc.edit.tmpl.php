@@ -1,148 +1,179 @@
   <form name="npc_edit" method="post" action="index.php?editor=npc&z=<?=$currzone?>&zoneid=<?=$currzoneid?>&npcid=<?=$npcid?>&action=2">
     <div class="edit_form">
       <div class="edit_form_header">Edit NPC <?=$npcid?></div>
-        <div class="edit_form_content">
-          <center>
-            <fieldset style="text-align: left;">
-              <legend><strong><font size="4">General</font></strong></legend>
-              <input type="hidden" name="id" value="<?=$npcid?>">
-              <table width="100%">
-                <tr>
-                  <td valign="top">
+      <div class="edit_form_content">
+        <center>
+          <fieldset style="text-align: left;">
+            <legend><strong><font size="4">General</font></strong></legend>
+            <table width="100%">
+              <tr>
+                <td valign="top">
+                  NPCID:<br>
+                  <input type="text" value="<?=$id?>" disabled><br><br>
                     NPC Name:<br><input type="text" name="name" size="40" value="<?=$name?>"><br><br>
                     Title:<br><input type="text" name="lastname" size="40" value="<?=$lastname?>"><br><br>
-                    Level:<br><input type="text" name="level" size="10" value="<?=$level?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>><br><br>
-                    Max Level:<br><input type="text" name="maxlevel" size="10" value="<?=$maxlevel?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>><br><br>
-                  </td>
-                  <td valign="top">
-                    Race:<br>
-                    <select name="race" style="width: 265px;" onChange="raceCheck();">
+                    Level:<br><input type="text" name="level" size="10" value="<?=$level?>"<?echo (isset($changed_level))  ? " style='background-color: #FFFF00;'" : "";?>><br><br>
+                    Max Level:<br><input type="text" name="maxlevel" size="10" value="<?=$maxlevel?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>><br><br>
+                </td>
+                <td valign="top">
+                  Race:<br>
+                  <select name="race" style="width: 265px;" onChange="raceCheck();">
 <?foreach($races as $key=>$value):?>
-                      <option value="<?=$key?>"<?echo ($key == $race)? " selected" : "";?>><?=$key?>: <?=$value?></option>
+                    <option value="<?=$key?>"<?echo ($key == $race)? " selected" : "";?>><?=$key?>: <?=$value?></option>
 <?endforeach;?>
-                    </select><br><br>
-                    Class:<br>
-                    <select name="class" style="width: 265px;">
+                  </select><br><br>
+                  Class:<br>
+                  <select name="class" style="width: 265px;">
 <?foreach($classes as $key=>$value):?>
-                      <option value="<?=$key?>"<?echo ($key == $class)? " selected" : "";?>><?=$key?>: <?=$value?></option>
+                    <option value="<?=$key?>"<?echo ($key == $class)? " selected" : "";?>><?=$key?>: <?=$value?></option>
 <?endforeach;?>
-                    </select><br><br>
-                    Bodytype:<br>
-                    <select name="bodytype" style="width: 265px;">
+                  </select><br><br>
+                  Bodytype:<br>
+                  <select name="bodytype" style="width: 265px;">
 <?foreach($bodytypes as $key=>$value):?>
-                      <option value="<?=$key?>"<?echo ($key == $bodytype)? " selected" : "";?>><?=$key?>: <?=$value?></option>
+                    <option value="<?=$key?>"<?echo ($key == $bodytype)? " selected" : "";?>><?=$key?>: <?=$value?></option>
 <?endforeach;?>
-                    </select><br><br>
-                    Gender:<br>
-                    <select name="gender">
+                  </select><br><br>
+                  Gender:<br>
+                  <select name="gender">
 <?foreach($genders as $key=>$value):?>
-                      <option value="<?=$key?>"<?echo ($key == $gender)? " selected" : "";?>><?=$value?></option>
+                    <option value="<?=$key?>"<?echo ($key == $gender)? " selected" : "";?>><?=$value?></option>
 <?endforeach;?>
-                    </select>
-                  </td>
-                </tr>
-              </table>
-            </fieldset><br>
-          </center>
-          <fieldset>
-            <legend><strong><font size="4">Vitals</font></strong></legend>
-            <table width="100%" border="0" cellpadding="3" cellspacing="0">
-              <tr>
-                <td align="left" width="17%">HP:      <br><input type="text" name="hp" size="10" value="<?=$hp?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="17%">Mana:    <br><input type="text" name="mana" size="10" value="<?=$mana?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="17%">AC:      <br><input type="text" name="AC" size="10" value="<?=$AC?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="17%">Runspeed:<br><input type="text" name="runspeed" size="10" value="<?=$runspeed?>"></td>
-                <td align="left" width="16%">ATK:     <br><input type="text" name="ATK" size="10" value="<?=$ATK?>"></td>
-                <td align="left" width="16%">Accuracy:<br><input type="text" name="Accuracy" size="10" value="<?=$Accuracy?>"></td>
-              </tr>
-              <tr>
-                <td align="left">See Invis:<br><input type="text" name="see_invis" size="10" value="<?=$see_invis?>"></td>
-                <td align="left">See ITU:  <br><input type="text" name="see_invis_undead" size="10" value="<?=$see_invis_undead?>"></td>
-                <td align="left">See Hide: <br><input type="text" name="see_hide" size="10" value="<?=$see_hide?>"></td>
-                <td align="left">See IH:   <br><input type="text" name="see_improved_hide" size="10" value="<?=$see_improved_hide?>"></td>
-                <td align="left">Avoidance:<br><input type="text" name="Avoidance" size="10" value="<?=$Avoidance?>"></td>
-                <td align="left">Scalerate:<br><input type="text" name="scalerate" size="10" value="<?=$scalerate?>"></td>
+                  </select>
+                </td>
               </tr>
             </table>
           </fieldset><br>
-          <fieldset>
-            <legend><strong><font size="4">Stats</font></strong></legend>
-            <table width="100%" border="0" cellpadding="3" cellspacing="0">
-              <tr>
-                <td align="left" width="14%">STR:<br><input type="text" name="STR" size="5" value="<?=$STR?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="14%">STA:<br><input type="text" name="STA" size="5" value="<?=$STA?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="14%">DEX:<br><input type="text" name="DEX" size="5" value="<?=$DEX?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="14%">AGI:<br><input type="text" name="AGI" size="5" value="<?=$AGI?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="14%">INT:<br><input type="text" name="_INT" size="5" value="<?=$_INT?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="15%">WIS:<br><input type="text" name="WIS" size="5" value="<?=$WIS?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="15%">CHA:<br><input type="text" name="CHA" size="5" value="<?=$CHA?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-              </tr>
-            </table>
-          </fieldset><br>
-          <fieldset>
-            <legend><strong><font size="4">Charmed Stats</font></strong></legend>
-            <table width="100%" border="0" cellpadding="3" cellspacing="0">
-              <tr>
-                <td colspan="7">0 = Not Used</td>
-              </tr>
-              <tr>
-                <td align="left" width="14%">AC:<br><input type="text" name="charm_ac" size="5" value="<?=$charm_ac?>"></td>
-                <td align="left" width="14%">Min Dmg:<br><input type="text" name="charm_min_dmg" size="5" value="<?=$charm_min_dmg?>"></td>
-                <td align="left" width="14%">Max Dmg:<br><input type="text" name="charm_max_dmg" size="5" value="<?=$charm_max_dmg?>"></td>
-                <td align="left" width="14%">Atk:<br><input type="text" name="charm_atk" size="5" value="<?=$charm_atk?>"></td>
-                <td align="left" width="14%">Atk Delay:<br><input type="text" name="charm_attack_delay" size="5" value="<?=$charm_attack_delay?>"></td>
-                <td align="left" width="15%">Accuracy:<br><input type="text" name="charm_accuracy_rating" size="5" value="<?=$charm_accuracy_rating?>"></td>
-                <td align="left" width="15%">Avoidance:<br><input type="text" name="charm_avoidance_rating" size="5" value="<?=$charm_avoidance_rating?>"></td>
-              </tr>
-            </table>
-          </fieldset><br>
-          <fieldset>
-            <legend><strong><font size="4">Resists</font></strong></legend>
-            <table width="100%" border="0" cellpadding="3" cellspacing="0">
-              <tr>
-                <td colspan="7">1 Resist = 0.5%<br>200 Resist = 100%</td>
-              </tr>
-              <tr>
-                <td align="left" width="13%">MR:      <br><input type="text" name="MR" size="5" value="<?=$MR?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="13%">CR:      <br><input type="text" name="CR" size="5" value="<?=$CR?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="13%">FR:      <br><input type="text" name="FR" size="5" value="<?=$FR?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="13%">PR:      <br><input type="text" name="PR" size="5" value="<?=$PR?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="13%">DR:      <br><input type="text" name="DR" size="5" value="<?=$DR?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="15%">Corrup:  <br><input type="text" name="Corrup" size="5" value="<?=$Corrup?>"></td>
+        </center>
+        <fieldset>
+          <legend><strong><font size="4">Vitals</font></strong></legend>
+          <table width="100%" border="0" cellpadding="3" cellspacing="0">
+            <tr>
+              <td align="left" width="17%">HP:      <br><input type="text" name="hp" size="10" value="<?=$hp?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="17%">Mana:    <br><input type="text" name="mana" size="10" value="<?=$mana?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="17%">AC:      <br><input type="text" name="AC" size="10" value="<?=$AC?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="17%">Runspeed:<br><input type="text" name="runspeed" size="10" value="<?=$runspeed?>"></td>
+              <td align="left" width="16%">ATK:     <br><input type="text" name="ATK" size="10" value="<?=$ATK?>"></td>
+              <td align="left" width="16%">Accuracy:<br><input type="text" name="Accuracy" size="10" value="<?=$Accuracy?>"></td>
+            </tr>
+            <tr>
+              <td align="left">
+                See Invis:<br>
+                <input type="text" name="see_invis" size="5" value="<?=$see_invis?>">
+              </td>
+              <td align="left">
+                See ITU:<br>
+                <select name="see_invis_undead">
+                  <option value="0"<?echo ($see_invis_undead == 0) ? " selected" : "";?>>No</option>
+                  <option value="1"<?echo ($see_invis_undead == 1) ? " selected" : "";?>>Yes</option>
+                </select>
+              </td>
+              <td align="left">
+                See Hide:<br>
+                <select name="see_hide">
+                  <option value="0"<?echo ($see_hide == 0) ? " selected" : "";?>>No</option>
+                  <option value="1"<?echo ($see_hide == 1) ? " selected" : "";?>>Yes</option>
+                </select>
+              </td>
+              <td align="left">
+                See IH:<br>
+                <select name="see_improved_hide">
+                  <option value="0"<?echo ($see_improved_hide == 0) ? " selected" : "";?>>No</option>
+                  <option value="1"<?echo ($see_improved_hide == 1) ? " selected" : "";?>>Yes</option>
+                </select>
+              </td>
+              <td align="left">Avoidance:<br><input type="text" name="Avoidance" size="10" value="<?=$Avoidance?>"></td>
+              <td align="left">Scalerate:<br><input type="text" name="scalerate" size="10" value="<?=$scalerate?>"></td>
+            </tr>
+          </table>
+        </fieldset><br>
+        <fieldset>
+          <legend><strong><font size="4">Stats</font></strong></legend>
+          <table width="100%" border="0" cellpadding="3" cellspacing="0">
+            <tr>
+              <td align="left" width="14%">STR:<br><input type="text" name="STR" size="5" value="<?=$STR?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="14%">STA:<br><input type="text" name="STA" size="5" value="<?=$STA?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="14%">DEX:<br><input type="text" name="DEX" size="5" value="<?=$DEX?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="14%">AGI:<br><input type="text" name="AGI" size="5" value="<?=$AGI?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="14%">INT:<br><input type="text" name="_INT" size="5" value="<?=$_INT?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="15%">WIS:<br><input type="text" name="WIS" size="5" value="<?=$WIS?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="15%">CHA:<br><input type="text" name="CHA" size="5" value="<?=$CHA?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+            </tr>
+          </table>
+        </fieldset><br>
+        <fieldset>
+          <legend><strong><font size="4">Charmed Stats</font></strong></legend>
+          <table width="100%" border="0" cellpadding="3" cellspacing="0">
+            <tr>
+              <td colspan="7">0 = Not Used</td>
+            </tr>
+            <tr>
+              <td align="left" width="14%">AC:<br><input type="text" name="charm_ac" size="5" value="<?=$charm_ac?>"></td>
+              <td align="left" width="14%">Min Dmg:<br><input type="text" name="charm_min_dmg" size="5" value="<?=$charm_min_dmg?>"></td>
+              <td align="left" width="14%">Max Dmg:<br><input type="text" name="charm_max_dmg" size="5" value="<?=$charm_max_dmg?>"></td>
+              <td align="left" width="14%">Atk:<br><input type="text" name="charm_atk" size="5" value="<?=$charm_atk?>"></td>
+              <td align="left" width="14%">Atk Delay:<br><input type="text" name="charm_attack_delay" size="5" value="<?=$charm_attack_delay?>"></td>
+              <td align="left" width="15%">Accuracy:<br><input type="text" name="charm_accuracy_rating" size="5" value="<?=$charm_accuracy_rating?>"></td>
+              <td align="left" width="15%">Avoidance:<br><input type="text" name="charm_avoidance_rating" size="5" value="<?=$charm_avoidance_rating?>"></td>
+            </tr>
+          </table>
+        </fieldset><br>
+        <fieldset>
+          <legend><strong><font size="4">Resists</font></strong></legend>
+          <table width="100%" border="0" cellpadding="3" cellspacing="0">
+            <tr>
+              <td colspan="7">1 Resist = 0.5%<br>200 Resist = 100%</td>
+            </tr>
+            <tr>
+              <td align="left" width="13%">MR:      <br><input type="text" name="MR" size="5" value="<?=$MR?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="13%">CR:      <br><input type="text" name="CR" size="5" value="<?=$CR?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="13%">FR:      <br><input type="text" name="FR" size="5" value="<?=$FR?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="13%">PR:      <br><input type="text" name="PR" size="5" value="<?=$PR?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="13%">DR:      <br><input type="text" name="DR" size="5" value="<?=$DR?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="15%">Corrup:  <br><input type="text" name="Corrup" size="5" value="<?=$Corrup?>"></td>
 <?
   $PhR_Default = 15 + ($level / 3);
   if ($level > 50)
     $PhR_Default += (3 * ($level - 50));
 ?>
-                <td align="left" width="20%">Physical: <a title="Set to Calculated Default" onClick="document.getElementById('PhR').value='<?echo round($PhR_Default, 4);?>';"><img src="images/refresh.gif" width="10"></a><br><input type="text" id="PhR" name="PhR" size="5" value="<?=$PhR?>"></td>
-              </tr>
-            </table>
-         </fieldset><br>
-         <fieldset>
-           <legend><strong><font size="4">Combat</font></strong></legend>
-             <table width="100%" border="0" cellpadding="3" cellspacing="0">
-               <tr>
-                <td align="left" width="14%">Min Dmg:     <br><input type="text" name="mindmg" size="5" value="<?=$mindmg?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="14%">HP Regen:    <br><input type="text" name="hp_regen_rate" size="5" value="<?=$hp_regen_rate?>"></td>
-                <td align="left" width="14%">Aggroradius: <br><input type="text" name="aggroradius" size="5" value="<?=$aggroradius?>"></td>
-                <td align="left" width="14%">Attack Count:<br><input type="text" name="attack_count" size="5" value="<?=$attack_count?>"></td>
-                <td align="left" width="14%">Atk Delay:   <br><input type="text" name="attack_delay" size="5" value="<?=$attack_delay?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="14%">Spells ID:   <br><input type="text" name="npc_spells_id" size="5" value="<?=$npc_spells_id?>"></td>
-                <td align="left" width="15%">Spell Scale: <br><input type="text" name="spellscale" size="5" value="<?=$spellscale?>">%</td>
-              </tr>
+              <td align="left" width="20%">Physical: <a title="Set to Calculated Default" onClick="document.getElementById('PhR').value='<?echo round($PhR_Default, 4);?>';"><img src="images/refresh.gif" width="10"></a><br><input type="text" id="PhR" name="PhR" size="5" value="<?=$PhR?>"></td>
+            </tr>
+          </table>
+        </fieldset><br>
+        <fieldset>
+          <legend><strong><font size="4">Combat</font></strong></legend>
+          <table width="100%" border="0" cellpadding="3" cellspacing="0">
+            <tr>
+              <td align="left" width="14%">Min Dmg:      <br><input type="text" name="mindmg" size="5" value="<?=$mindmg?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?> onChange="sdamageCheck();"></td>
+              <td align="left" width="14%">HP Regen:     <br><input type="text" name="hp_regen_rate" size="5" value="<?=$hp_regen_rate?>"></td>
+              <td align="left" width="14%">HP Reg (/sec):<br><input type="text" name="hp_regen_per_second" size="5" value="<?=$hp_regen_per_second?>"></td>
+              <td align="left" width="14%">Attack Count: <br><input type="text" name="attack_count" size="5" value="<?=$attack_count?>"></td>
+              <td align="left" width="14%">Atk Delay:    <br><input type="text" name="attack_delay" size="5" value="<?=$attack_delay?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?>></td>
+              <td align="left" width="15%">Spells ID:    <br><input type="text" name="npc_spells_id" size="5" value="<?=$npc_spells_id?>"></td>
+              <td align="left" width="15%">Spell Scale:  <br><input type="text" name="spellscale" size="5" value="<?=$spellscale?>">%</td>
+            </tr>
+            <tr>
+              <td align="left" width="14%">Max Dmg:     <br><input type="text" name="maxdmg" size="5" value="<?=$maxdmg?>"<?echo (isset($changed_level)) ? " style='background-color: #FFFF00;'" : "";?> onChange="sdamageCheck();"></td>
+              <td align="left" width="14%">MP Regen:    <br><input type="text" name="mana_regen_rate" size="5" value="<?=$mana_regen_rate?>"></td>
+              <td align="left" width="14%">Aggroradius: <br><input type="text" name="aggroradius" size="5" value="<?=$aggroradius?>"></td>
+              <td align="left" width="14%">Assistradius:<br><input type="text" name="assistradius" size="5" value="<?=$assistradius?>"></td>
+              <td align="left" width="14%">Always Aggro:<br><input type="text" name="always_aggro" size="5" value="<?=$always_aggro?>"></td>
+              <td align="left" width="14%">Slow Mit:    <br><input type="text" name="slow_mitigation" size="5" value="<?=$slow_mitigation?>"></td>
+              <td align="left" width="15%">Heal Scale:  <br><input type="text" name="healscale" size="5" value="<?=$healscale?>">%</td>
+            </tr>
+            <tr>
+              <td align="left" width="14%">Heroic Strikethrough:<br><input type="text" name="heroic_strikethrough" size="5" value="<?=$heroic_strikethrough?>"></td>
+              <td align="left" width="14%">&nbsp;</td>
+              <td align="left" width="14%">&nbsp;</td>
+              <td align="left" width="14%">&nbsp;</td>
+              <td align="left" width="14%">&nbsp;</td>
+              <td align="left" width="14%">&nbsp;</td>
+              <td align="left" width="15%">&nbsp;</td>
+            </tr>
+          </table>
+          <center>
+            <table cellpadding="20px">
               <tr>
-                <td align="left" width="14%">Max Dmg:     <br><input type="text" name="maxdmg" size="5" value="<?=$maxdmg?>"<?echo ($changed_level) ? " style='background-color: #FFFF00;'" : "";?>></td>
-                <td align="left" width="14%">MP Regen:    <br><input type="text" name="mana_regen_rate" size="5" value="<?=$mana_regen_rate?>"></td>
-                <td align="left" width="14%">Assistradius:<br><input type="text" name="assistradius" size="5" value="<?=$assistradius?>"></td>
-                <td align="left" width="14%">Always Aggro:<br><input type="text" name="always_aggro" size="5" value="<?=$always_aggro?>"></td>
-                <td align="left" width="14%">Slow Mit:    <br><input type="text" name="slow_mitigation" size="5" value="<?=$slow_mitigation?>"></td>
-                <td align="left" width="14%">&nbsp;</td>
-                <td align="left" width="15%">Heal Scale:  <br><input type="text" name="healscale" size="5" value="<?=$healscale?>">%</td>
-              </tr>
-            </table>
-            <center>
-              <table cellpadding="20px">
-                <tr>
 <?
   $specabil = array();
   $specabilcont = array();
@@ -181,26 +212,18 @@
   }
 ?>
                 <td valign="top" align="left">
-                  Summon (1):<br><input type="text" name="1" size="10" value="<?=$specabilcont[1]?>"><br>
-                  Enrage (2):<br><input type="text" name="2" size="10" value="<?=$specabilcont[2]?>"><br>
-                  Rampage (3):<br><input type="text" name="3" size="10" value="<?=$specabilcont[3]?>"><br>
-                  AE Rampage (4):<br><input type="text" name="4" size="10" value="<?=$specabilcont[4]?>"><br>
-                  Flurry (5):<br><input type="text" name="5" size="10" value="<?=$specabilcont[5]?>"><br>
-                  Tunnel Vision (29):<br><input type="text" name="29" size="10" value="<?=$specabilcont[29]?>"><br>
-                  Leashed (32):<br><input type="text" name="32" size="10" value="<?=$specabilcont[32]?>" onChange="tetherCheck();"><br>
-                  Tethered (33):<br><input type="text" name="33" size="10" value="<?=$specabilcont[33]?>" onChange="tetherCheck();"><br>
-                  Flee Percent (37):<br><input type="text" name="37" size="10" value="<?=$specabilcont[37]?>"><br>
-                  Chase Distance (40):<br><input type="text" name="40" size="10" value="<?=$specabilcont[40]?>"><br>
-                  Casting Resist Diff (43):<br><input type="text" name="43" size="10" value="<?=$specabilcont[43]?>"><br>
-                  Counter Avoid Damage (44):<br>
-                    <select name="44">
-                      <option value=""<?echo ($specabilcont[44] == '') ? ' selected' : '';?>>None</option>
-                      <option value="44,0^"<?echo ($specabilcont[44] == '44,0') ? ' selected' : '';?>>All (44,0)</option>
-                      <option value="44,1^"<?echo ($specabilcont[44] == '44,1') ? ' selected' : '';?>>Riposte (44,1)</option>
-                      <option value="44,2^"<?echo ($specabilcont[44] == '44,2') ? ' selected' : '';?>>Block (44,2)</option>
-                      <option value="44,3^"<?echo ($specabilcont[44] == '44,3') ? ' selected' : '';?>>Parry (44,3)</option>
-                      <option value="44,4^"<?echo ($specabilcont[44] == '44,4') ? ' selected' : '';?>>Dodge (44,4)</option>
-                    </select><br>
+                  Summon (1):<br><input type="text" name="1" size="10" value="<?echo (isset($specabilcont[1])) ? $specabilcont[1] : "";?>"><br>
+                  Enrage (2):<br><input type="text" name="2" size="10" value="<?echo (isset($specabilcont[2])) ? $specabilcont[2] : "";?>"><br>
+                  Rampage (3):<br><input type="text" name="3" size="10" value="<?echo (isset($specabilcont[3])) ? $specabilcont[3] : "";?>"><br>
+                  AE Rampage (4):<br><input type="text" name="4" size="10" value="<?echo (isset($specabilcont[4])) ? $specabilcont[4] : "";?>"><br>
+                  Flurry (5):<br><input type="text" name="5" size="10" value="<?echo (isset($specabilcont[5])) ? $specabilcont[5] : "";?>"><br>
+                  Tunnel Vision (29):<br><input type="text" name="29" size="10" value="<?echo (isset($specabilcont[29])) ? $specabilcont[29] : "";?>"><br>
+                  Leashed (32):<br><input type="text" name="32" size="10" value="<?echo (isset($specabilcont[32])) ? $specabilcont[32] : "";?>" onChange="tetherCheck();"><br>
+                  Tethered (33):<br><input type="text" name="33" size="10" value="<?echo (isset($specabilcont[33])) ? $specabilcont[33] : "";?>" onChange="tetherCheck();"><br>
+                  Flee Percent (37):<br><input type="text" name="37" size="10" value="<?echo (isset($specabilcont[37])) ? $specabilcont[37] : "";?>"><br>
+                  Chase Distance (40):<br><input type="text" name="40" size="10" value="<?echo (isset($specabilcont[40])) ? $specabilcont[40] : "";?>"><br>
+                  Casting Resist Diff (43):<br><input type="text" name="43" size="10" value="<?echo (isset($specabilcont[43])) ? $specabilcont[43] : "";?>"><br>
+                  Counter Avoid Damage (44):<br><input type="text" name="44" size="10" value="<?echo (isset($specabilcont[44])) ? $specabilcont[44] : "";?>"><br>
                 </td>
                 <td valign="top" align="left">
                   <input type="checkbox" name="6" value="6,1^"<?echo ($specabil[6] == 1) ? " checked" : "";?>> Triple Attack (6)<br>
@@ -275,7 +298,13 @@
               <td align="left" width="17%">Hero's Forge Model:<br><input type="text" name="herosforgemodel" size="10" value="<?=$herosforgemodel?>"></td>
               <td align="left" width="17%">Light Source:<br><input type="text" name="light" size="10" value="<?=$light?>"></td>
               <td align="left" width="17%">Model:<br><input type="text" name="model" size="10" value="<?=$model?>"></td>
-              <td align="left" width="17%">&nbsp;</td>
+              <td align="left" width="17%">
+                Show Name:<br>
+                <select name="show_name">
+                  <option value="0"<?echo ($show_name == 0) ? " selected" : "";?>>No (0)</option>
+                  <option value="1"<?echo ($show_name == 1) ? " selected" : "";?>>Yes (1)</option>
+                </select>
+              </td>
               <td align="left" width="16%">&nbsp;</td>
               <td align="left" width="16%">&nbsp;</td>
             </tr>
@@ -286,7 +315,7 @@
                 Melee1 Type:<br>
                 <select name="prim_melee_type" style="width: 200px;">
 <?foreach($skilltypes as $key=>$value):?>
-                  <option value="<?=$key?>"<?echo ($key == $prim_melee_type)? " selected" : "";?>><?=$key?>: <?=$value?></option>
+                  <option value="<?=$key?>"<?echo ($key == $prim_melee_type) ? " selected" : "";?>><?=$key?>: <?=$value?></option>
 <?endforeach;?>
                 </select>
               </td>
@@ -294,7 +323,7 @@
                 Melee2 Type:<br>
                 <select name="sec_melee_type" style="width: 200px;">
 <?foreach($skilltypes as $key=>$value):?>
-                  <option value="<?=$key?>"<?echo ($key == $sec_melee_type)? " selected" : "";?>><?=$key?>: <?=$value?></option>
+                  <option value="<?=$key?>"<?echo ($key == $sec_melee_type) ? " selected" : "";?>><?=$key?>: <?=$value?></option>
 <?endforeach;?>
                 </select>
               </td>
@@ -336,16 +365,25 @@
             </tr>
             <tr>
               <td align="left" width="17%">
-                Flymode<br>
+                Flymode:<br>
                 <select name="flymode">
 <?foreach ($flymodetype as $key=>$value):?>
                   <option value="<?=$key?>"<?echo ($flymode == $key) ? " selected" : "";?>><?=$key?>: <?=$value?></option>
 <?endforeach;?>
                 </select>
               </td>
-              <td align="left" width="17%">&nbsp;</td>
-              <td align="left" width="17%">&nbsp;</td>
-              <td align="left" width="17%">&nbsp;</td>
+              <td align="left" width="17%">
+                Faction Amt:<br>
+                <input type="text" size="10" name="faction_amount" value="<?=$faction_amount?>">
+              </td>
+              <td align="left" width="17%">
+                Keeps Sold Items:<br>
+                <input type="text" size="10" name="keeps_sold_items" value="<?=$keeps_sold_items?>">
+              </td>
+              <td align="left" width="17%">
+                Trap Template:<br>
+                <input type="text" size="10" name="trap_template" value="<?=$trap_template?>">
+              </td>
               <td align="left" width="16%">&nbsp;</td>
               <td align="left" width="16%">&nbsp;</td>
             </tr>
@@ -378,7 +416,8 @@
           </center>
         </fieldset><br>
         <center>
-          <input type="submit" value="Submit Changes">&nbsp;&nbsp;
+          <input type="hidden" name="id" value="<?=$npcid?>">
+          <input type="submit" value="Update NPC">&nbsp;&nbsp;
           <input type="button" value="Cancel" onClick="history.back();">
         </center>
       </div>

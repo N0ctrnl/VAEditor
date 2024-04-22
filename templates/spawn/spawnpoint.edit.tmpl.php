@@ -70,7 +70,10 @@
             </td>
             <td>
               <strong>Enabled:</strong><br>
-              <input type="text" name="enabled" size="15" value="<?=$enabled?>">
+              <select name="disabled">
+                <option value="1"<?echo ($disabled == 1) ? " selected" : "";?>>No</option>
+                <option value="0"<?echo ($disabled == 0) ? " selected" : "";?>>Yes</option>
+              </select>
             </td>
             <td align="left">
               <strong>Animation:</strong><br>
@@ -90,6 +93,11 @@
               <strong>Max Expansion:</strong><br>
               <input type="text" name="max_expansion" size="15" value="<?=$max_expansion?>">
             </td>
+            <td>
+              <strong>Disabled Instance:</strong><br>
+              <input type="text" name="instance_id" size="15" value="<?=$instance_id?>">
+            </td>
+            <td>&nbsp;</td>
           </tr>
           <tr>
             <td colspan="2">

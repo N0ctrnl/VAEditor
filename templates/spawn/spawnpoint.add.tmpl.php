@@ -70,7 +70,10 @@
             </td>
             <td>
               <strong>Enabled:</strong><br>
-              <input type="text" name="enabled" size="15" value="1">
+              <select name="disabled">
+                <option value="1">No</option>
+                <option value="0" selected>Yes</option>
+              </select>
             </td>
             <td align="left">
               <strong>Animation:</strong><br>
@@ -84,12 +87,17 @@
           <tr>
             <td>
               <strong>Min Expansion:</strong><br>
-              <input type="text" name="min_expansion" size="15" value="0">
+              <input type="text" name="min_expansion" size="15" value="-1">
             </td>
             <td>
               <strong>Max Expansion:</strong><br>
-              <input type="text" name="max_expansion" size="15" value="0">
+              <input type="text" name="max_expansion" size="15" value="-1">
             </td>
+            <td>
+              <strong>Disabled Instance:</strong><br>
+              <input type="text" name="instance_id" size="15" value="0">
+            </td>
+            <td>&nbsp;</td>
           </tr>
           <tr>
             <td colspan="2">

@@ -296,7 +296,7 @@ function get_blockedspell() {
 
   $bsid = $_GET['bsid'];
 
-  $query = "SELECT id AS bsid, spellid, type, zoneid AS bszoneid, x AS x_coord, y AS y_coord, z AS z_coord, x_diff, y_diff, z_diff, message, description FROM blocked_spells WHERE id=\"$bsid\"";
+  $query = "SELECT id AS bsid, spellid, type, zoneid AS bszoneid, x AS x_coord, y AS y_coord, z AS z_coord, x_diff, y_diff, z_diff, message, description, min_expansion, max_expansion, content_flags, content_flags_disabled FROM blocked_spells WHERE id=\"$bsid\"";
   $result = $mysql_content_db->query_assoc($query);
 
   return $result;
@@ -319,6 +319,7 @@ function update_zone() {
   if ($safe_heading != $_POST['safe_heading']) $fields .= "safe_heading=\"" . $_POST['safe_heading'] . "\", ";
   if ($graveyard_id != $_POST['graveyard_id']) $fields .= "graveyard_id=\"" . $_POST['graveyard_id'] . "\", ";
   if ($min_level != $_POST['min_level']) $fields .= "min_level=\"" . $_POST['min_level'] . "\", ";
+  if ($max_level != $_POST['max_level']) $fields .= "max_level=\"" . $_POST['max_level'] . "\", ";
   if ($min_status != $_POST['min_status']) $fields .= "min_status=\"" . $_POST['min_status'] . "\", ";
   if ($zoneidnumber != $_POST['zoneidnumber']) $fields .= "zoneidnumber=\"" . $_POST['zoneidnumber']. "\", ";
   if ($version != $_POST['version']) $fields .= "version=\"" . $_POST['version'] . "\", ";
@@ -370,6 +371,7 @@ function update_zone() {
   if ($shutdowndelay != $_POST['shutdowndelay']) $fields .= "shutdowndelay=\"" . $_POST['shutdowndelay'] . "\", ";
   if ($peqzone != $_POST['peqzone']) $fields .= "peqzone=\"" . $_POST['peqzone'] . "\", ";
   if ($expansion != $_POST['expansion']) $fields .= "expansion=\"" . $_POST['expansion'] . "\", ";
+  if ($bypass_expansion_check != $_POST['bypass_expansion_check']) $fields .= "bypass_expansion_check=\"" . $_POST['bypass_expansion_check'] . "\", ";
   if ($suspendbuffs!= $_POST['suspendbuffs']) $fields .= "suspendbuffs=\"" . $_POST['suspendbuffs'] . "\", ";
   if ($rain_chance1 != $_POST['rain_chance1']) $fields .= "rain_chance1=\"" . $_POST['rain_chance1'] . "\", ";
   if ($rain_chance2 != $_POST['rain_chance2']) $fields .= "rain_chance2=\"" . $_POST['rain_chance2'] . "\", ";
@@ -398,6 +400,10 @@ function update_zone() {
   if ($min_expansion != $_POST['min_expansion']) $fields .= "min_expansion=\"" . $_POST['min_expansion'] . "\", ";
   if ($max_expansion != $_POST['max_expansion']) $fields .= "max_expansion=\"" . $_POST['max_expansion'] . "\", ";
   if ($underworld_teleport_index != $_POST['underworld_teleport_index']) $fields .= "underworld_teleport_index=\"" . $_POST['underworld_teleport_index'] . "\", ";
+  if ($lava_damage != $_POST['lava_damage']) $fields .= "lava_damage=\"" . $_POST['lava_damage'] . "\", ";
+  if ($min_lava_damage != $_POST['min_lava_damage']) $fields .= "min_lava_damage=\"" . $_POST['min_lava_damage'] . "\", ";
+  if ($idle_when_empty != $_POST['idle_when_empty']) $fields .= "idle_when_empty=\"" . $_POST['idle_when_empty'] . "\", ";
+  if ($seconds_before_idle != $_POST['seconds_before_idle']) $fields .= "seconds_before_idle=\"" . $_POST['seconds_before_idle'] . "\", ";
 
   if ($content_flags != $_POST['content_flags']) {
     if ($_POST['content_flags'] == "") {
@@ -494,9 +500,23 @@ function update_blockedspell() {
   $z_diff = $_POST['z_diff'];
   $message = $mysql_content_db->real_escape_string($_POST['message']); 
   $description = $_POST['description'];
+  $min_expansion = $_POST['min_expansion'];
+  $max_expansion = $_POST['max_expansion'];
+  $content_flags = $_POST['content_flags'];
+  $content_flags_disabled = $_POST['content_flags_disabled'];
 
-  $query = "UPDATE blocked_spells SET spellid=\"$spellid\", type=\"$type\", x=\"$x_coord\", y=\"$y_coord\", z=\"$z_coord\", x_diff=\"$x_diff\", y_diff=\"$y_diff\", z_diff=\"$z_diff\", message=\"$message\", description=\"$description\" WHERE id=\"$bsid\"";
+  $query = "UPDATE blocked_spells SET spellid=\"$spellid\", type=\"$type\", x=\"$x_coord\", y=\"$y_coord\", z=\"$z_coord\", x_diff=\"$x_diff\", y_diff=\"$y_diff\", z_diff=\"$z_diff\", message=\"$message\", description=\"$description\", min_expansion=\"$min_expansion\", max_expansion=\"$max_expansion\", content_flags=NULL, content_flags_disabled=NULL WHERE id=\"$bsid\"";
   $mysql_content_db->query_no_result($query);
+
+  if ($content_flags != "") {
+    $query = "UPDATE blocked_spells SET content_flags=\"$content_flags\" WHERE id=\"$bsid\"";
+    $mysql_content_db->query_no_result($query);
+  }
+
+  if ($content_flags_disabled != "") {
+    $query = "UPDATE blocked_spells SET content_flags_disabled=\"$content_flags_disabled\" WHERE id=\"$bsid\"";
+    $mysql_content_db->query_no_result($query);
+  }
 }
 
 function delete_graveyard() {
@@ -638,9 +658,23 @@ function add_blockedspell() {
   $z_diff = $_POST['z_diff'];
   $message = $mysql_content_db->real_escape_string($_POST['message']); 
   $description = $_POST['description'];
+  $min_expansion = $_POST['min_expansion'];
+  $max_expansion = $_POST['max_expansion'];
+  $content_flags = $_POST['content_flags'];
+  $content_flags_disabled = $_POST['content_flags_disabled'];
 
-  $query = "INSERT INTO blocked_spells SET id=\"$bsid\", zoneid=\"$zoneid\", spellid=\"$spellid\", type=\"$type\", x=\"$x_coord\", y=\"$y_coord\", z=\"$z_coord\", x_diff=\"$x_diff\", y_diff=\"$y_diff\", z_diff=\"$z_diff\", message=\"$message\", description=\"$description\"";
+  $query = "INSERT INTO blocked_spells SET id=\"$bsid\", zoneid=\"$zoneid\", spellid=\"$spellid\", type=\"$type\", x=\"$x_coord\", y=\"$y_coord\", z=\"$z_coord\", x_diff=\"$x_diff\", y_diff=\"$y_diff\", z_diff=\"$z_diff\", message=\"$message\", description=\"$description\", min_expansion=\"$min_expansion\", max_expansion=\"$max_expansion\", content_flags=NULL, content_flags_disabled=NULL";
   $mysql_content_db->query_no_result($query);
+
+  if ($content_flags != "") {
+    $query = "UPDATE blocked_spells SET content_flags=\"$content_flags\" WHERE id=\"$bsid\"";
+    $mysql_content_db->query_no_result($query);
+  }
+
+  if ($content_flags_disabled != "") {
+    $query = "UPDATE blocked_spells SET content_flags_disabled=\"$content_flags_disabled\" WHERE id=\"$bsid\"";
+    $mysql_content_db->query_no_result($query);
+  }
 }
 
 function graveyard_info() {
@@ -686,7 +720,7 @@ function blockedspell_info() {
   $result = $mysql_content_db->query_mult_assoc($query);
   if ($result) {
     foreach ($result as $result) {
-      $array['blockedspell'][$result['id']] = array("bsid"=>$result['id'], "spellid"=>$result['spellid'], "type"=>$result['type'], "zoneid"=>$result['zoneid'], "x_coord"=>$result['x'], "y_coord"=>$result['y'], "z_coord"=>$result['z'], "x_diff"=>$result['x_diff'], "y_diff"=>$result['y_diff'], "z_diff"=>$result['z_diff'], "message"=>$result['message'], "description"=>$result['description']);
+      $array['blockedspell'][$result['id']] = array("bsid"=>$result['id'], "spellid"=>$result['spellid'], "type"=>$result['type'], "zoneid"=>$result['zoneid'], "x_coord"=>$result['x'], "y_coord"=>$result['y'], "z_coord"=>$result['z'], "x_diff"=>$result['x_diff'], "y_diff"=>$result['y_diff'], "z_diff"=>$result['z_diff'], "message"=>$result['message'], "description"=>$result['description'], "min_expansion"=>$result['min_expansion'], "max_expansion"=>$result['max_expansion'], "content_flags"=>$result['content_flags'], "content_flags_disabled"=>$result['content_flags_disabled']);
     }
   }
   return $array;
@@ -706,8 +740,8 @@ function get_graveyard_zone() {
 function copy_zone() {
   global $mysql_content_db, $zoneid, $z;
 
-  $query = "INSERT INTO zone (`short_name`, `file_name`, `long_name`, `map_file_name`, `safe_x`, `safe_y`, `safe_z`, `graveyard_id`, `min_level`, `min_status`, `zoneidnumber`, `version`, `timezone`, `maxclients`, `ruleset`, `note`, `underworld`, `minclip`, `maxclip`, `fog_minclip`, `fog_maxclip`, `fog_blue`, `fog_red`, `fog_green`, `sky`, `ztype`, `zone_exp_multiplier`, `walkspeed`, `time_type`, `fog_red1`, `fog_green1`, `fog_blue1`, `fog_minclip1`, `fog_maxclip1`, `fog_red2`, `fog_green2`, `fog_blue2`, `fog_minclip2`, `fog_maxclip2`, `fog_red3`, `fog_green3`, `fog_blue3`, `fog_minclip3`, `fog_maxclip3`, `fog_red4`, `fog_green4`, `fog_blue4`, `fog_minclip4`, `fog_maxclip4`, `fog_density`, `flag_needed`, `canbind`, `cancombat`, `canlevitate`, `castoutdoor`, `hotzone`, `insttype`, `shutdowndelay`, `peqzone`, `expansion`, `suspendbuffs`, `rain_chance1`, `rain_chance2`, `rain_chance3`, `rain_chance4`, `rain_duration1`, `rain_duration2`, `rain_duration3`, `rain_duration4`, `snow_chance1`, `snow_chance2`, `snow_chance3`, `snow_chance4`, `snow_duration1`, `snow_duration2`, `snow_duration3`, `snow_duration4`, `gravity`, `type`, `skylock`, `fast_regen_hp`, `fast_regen_mana`, `fast_regen_endurance`, `npc_max_aggro_dist`, `max_movement_update_range`, min_expansion, max_expansion, content_flags, content_flags_disabled, underworld_teleport_index)
-            SELECT `short_name`, `file_name`, `long_name`, `map_file_name`, `safe_x`, `safe_y`, `safe_z`, `graveyard_id`, `min_level`, `min_status`, `zoneidnumber`, `version`, `timezone`, `maxclients`, `ruleset`, `note`, `underworld`, `minclip`, `maxclip`, `fog_minclip`, `fog_maxclip`, `fog_blue`, `fog_red`, `fog_green`, `sky`, `ztype`, `zone_exp_multiplier`, `walkspeed`, `time_type`, `fog_red1`, `fog_green1`, `fog_blue1`, `fog_minclip1`, `fog_maxclip1`, `fog_red2`, `fog_green2`, `fog_blue2`, `fog_minclip2`, `fog_maxclip2`, `fog_red3`, `fog_green3`, `fog_blue3`, `fog_minclip3`, `fog_maxclip3`, `fog_red4`, `fog_green4`, `fog_blue4`, `fog_minclip4`, `fog_maxclip4`, `fog_density`, `flag_needed`, `canbind`, `cancombat`, `canlevitate`, `castoutdoor`, `hotzone`, `insttype`, `shutdowndelay`, `peqzone`, `expansion`, `suspendbuffs`, `rain_chance1`, `rain_chance2`, `rain_chance3`, `rain_chance4`, `rain_duration1`, `rain_duration2`, `rain_duration3`, `rain_duration4`, `snow_chance1`, `snow_chance2`, `snow_chance3`, `snow_chance4`, `snow_duration1`, `snow_duration2`, `snow_duration3`, `snow_duration4`, `gravity`, `type`, `skylock`, `fast_regen_hp`, `fast_regen_mana`, `fast_regen_endurance`, `npc_max_aggro_dist`, `max_movement_update_range`, min_expansion, max_expansion, content_flags, content_flags_disabled, underworld_teleport_index FROM zone WHERE id=$zoneid";
+  $query = "INSERT INTO zone (`short_name`, `file_name`, `long_name`, `map_file_name`, `safe_x`, `safe_y`, `safe_z`, `graveyard_id`, `min_level`, `max_level`, `min_status`, `zoneidnumber`, `version`, `timezone`, `maxclients`, `ruleset`, `note`, `underworld`, `minclip`, `maxclip`, `fog_minclip`, `fog_maxclip`, `fog_blue`, `fog_red`, `fog_green`, `sky`, `ztype`, `zone_exp_multiplier`, `walkspeed`, `time_type`, `fog_red1`, `fog_green1`, `fog_blue1`, `fog_minclip1`, `fog_maxclip1`, `fog_red2`, `fog_green2`, `fog_blue2`, `fog_minclip2`, `fog_maxclip2`, `fog_red3`, `fog_green3`, `fog_blue3`, `fog_minclip3`, `fog_maxclip3`, `fog_red4`, `fog_green4`, `fog_blue4`, `fog_minclip4`, `fog_maxclip4`, `fog_density`, `flag_needed`, `canbind`, `cancombat`, `canlevitate`, `castoutdoor`, `hotzone`, `insttype`, `shutdowndelay`, `peqzone`, `expansion`, `bypass_expansion_check`, `suspendbuffs`, `rain_chance1`, `rain_chance2`, `rain_chance3`, `rain_chance4`, `rain_duration1`, `rain_duration2`, `rain_duration3`, `rain_duration4`, `snow_chance1`, `snow_chance2`, `snow_chance3`, `snow_chance4`, `snow_duration1`, `snow_duration2`, `snow_duration3`, `snow_duration4`, `gravity`, `type`, `skylock`, `fast_regen_hp`, `fast_regen_mana`, `fast_regen_endurance`, `npc_max_aggro_dist`, `max_movement_update_range`, min_expansion, max_expansion, content_flags, content_flags_disabled, underworld_teleport_index, lava_damage, min_lava_damage, idle_when_empty, seconds_before_idle)
+            SELECT `short_name`, `file_name`, `long_name`, `map_file_name`, `safe_x`, `safe_y`, `safe_z`, `graveyard_id`, `min_level`, `max_level`, `min_status`, `zoneidnumber`, `version`, `timezone`, `maxclients`, `ruleset`, `note`, `underworld`, `minclip`, `maxclip`, `fog_minclip`, `fog_maxclip`, `fog_blue`, `fog_red`, `fog_green`, `sky`, `ztype`, `zone_exp_multiplier`, `walkspeed`, `time_type`, `fog_red1`, `fog_green1`, `fog_blue1`, `fog_minclip1`, `fog_maxclip1`, `fog_red2`, `fog_green2`, `fog_blue2`, `fog_minclip2`, `fog_maxclip2`, `fog_red3`, `fog_green3`, `fog_blue3`, `fog_minclip3`, `fog_maxclip3`, `fog_red4`, `fog_green4`, `fog_blue4`, `fog_minclip4`, `fog_maxclip4`, `fog_density`, `flag_needed`, `canbind`, `cancombat`, `canlevitate`, `castoutdoor`, `hotzone`, `insttype`, `shutdowndelay`, `peqzone`, `expansion`, `bypass_expansion_check`, `suspendbuffs`, `rain_chance1`, `rain_chance2`, `rain_chance3`, `rain_chance4`, `rain_duration1`, `rain_duration2`, `rain_duration3`, `rain_duration4`, `snow_chance1`, `snow_chance2`, `snow_chance3`, `snow_chance4`, `snow_duration1`, `snow_duration2`, `snow_duration3`, `snow_duration4`, `gravity`, `type`, `skylock`, `fast_regen_hp`, `fast_regen_mana`, `fast_regen_endurance`, `npc_max_aggro_dist`, `max_movement_update_range`, min_expansion, max_expansion, content_flags, content_flags_disabled, underworld_teleport_index, lava_damage, min_lava_damage, idle_when_empty, seconds_before_idle FROM zone WHERE id=$zoneid";
   $mysql_content_db->query_no_result($query);
 
   $query = "SELECT MAX(id) AS zid FROM zone";
@@ -747,7 +781,7 @@ function get_isglobal() {
 }
 
 function update_global() {
-  global $mysql_content_db, $z, $zoneid;
+  global $mysql, $mysql_content_db, $z, $zoneid;
 
   $zid = getZoneID($z);
 
@@ -759,7 +793,7 @@ function update_global() {
   $result2 = $mysql->query_assoc($query2);
   $currid = $result2['currid'];
 
-  $query = "REPLACE INTO instance_list SET id=$currid, zone=$zid, version=$zversion, is_global=1, never_expires=1";
+  $query = "REPLACE INTO instance_list SET id=$currid, zone=$zid, version=$zversion, is_global=1, never_expires=1, notes=\"\"";
   $mysql->query_no_result($query);
 }
 

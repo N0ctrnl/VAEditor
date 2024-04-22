@@ -1,6 +1,7 @@
   <div class="table_container">
     <div class="table_header">
       <div style="float:right">
+        <a href="index.php?editor=player&playerid=<?=$playerid?>&action=13"><img src="images/view_all.gif" style="border: 0" title="View Stats Record" alt="View Stats Record"></a>&nbsp;
         <a href="index.php?editor=inv&playerid=<?=$playerid?>&action=1"><img src="images/contents.png" style="border: 0;" title="View Inventory" alt="View Inventory"></a>&nbsp;
         <a href="index.php?editor=keys&playerid=<?=$playerid?>&action=1"><img src="images/key.png" style="border: 0;" title="View Keyring" alt="View Keyring"></a>&nbsp;
         <a onClick="javascript:alert('Not yet!');"><img src="images/c_table.gif" style="border: 0;" title="Edit this Player" alt="Edit this Player"></a>&nbsp;
@@ -45,9 +46,9 @@
                   </fieldset>
                   <fieldset>
                     <legend><strong>Guild Info</strong></legend>
-                    Guild: <?echo ($guild_id > 0) ? '<a href="index.php?editor=guild&guildid=' . $guild_id . '">' . getGuildName($guild_id) . '</a>' : "None";?><br>
-                    Guild Rank: <?echo ($guild_id > 0) ? $guild_rank : "N/A";?><br>
-                    Guild Banker: <?echo ($guild_id > 0) ? $yesno[$guild_banker] : "N/A";?><br>
+                    Guild: <?echo (isset($guild_id) && $guild_id > 0) ? '<a href="index.php?editor=guild&guildid=' . $guild_id . '">' . getGuildName($guild_id) . '</a>' : "None";?><br>
+                    Guild Rank: <?echo (isset($guild_id) && $guild_id > 0) ? $guild_rank : "N/A";?><br>
+                    Guild Banker: <?echo (isset($guild_id) && $guild_id > 0) ? $yesno[$guild_banker] : "N/A";?><br>
                   </fieldset>
                   <fieldset>
                     <legend><strong>Vitals</strong></legend>
@@ -73,7 +74,8 @@
                     LFP: <?=$yesno[$lfp]?><br>
                     Drunkness: <?=$intoxication?><br>
                     Toxicity: <?=$toxicity?><br>
-                    Autosplit: <?=$yesno[$autosplit_enabled]?>
+                    Autosplit: <?=$yesno[$autosplit_enabled]?><br>
+                    Exp Enabled: <?=$yesno[$exp_enabled]?> [<a href="index.php?editor=player&playerid=<?=$id?>&action=12">Change</a>]
                   </fieldset>
                 </td>
               </tr>
@@ -206,32 +208,32 @@
                       <tr>
                         <td align="center" width="25%">GUK:</td>
                         <td align="center" width="25%"><?=$ldon_points_guk?></td>
-                        <td align="center" width="25%"><?=$guk_wins?></td>
-                        <td align="center" width="25%"><?=$guk_losses?></td>
+                        <td align="center" width="25%"><?echo (isset($guk_wins)) ? $guk_wins : 0;?></td>
+                        <td align="center" width="25%"><?echo (isset($guk_losses)) ? $guk_losses : 0;?></td>
                       </tr>
                       <tr>
                         <td align="center" width="25%">MIR:</td>
                         <td align="center" width="25%"><?=$ldon_points_mir?></td>
-                        <td align="center" width="25%"><?=$mir_wins?></td>
-                        <td align="center" width="25%"><?=$mir_losses?></td>
+                        <td align="center" width="25%"><?echo (isset($mir_wins)) ? $mir_wins : 0;?></td>
+                        <td align="center" width="25%"><?echo (isset($mir_losses)) ? $mir_losses : 0;?></td>
                       </tr>
                       <tr>
                         <td align="center" width="25%">MMC:</td>
                         <td align="center" width="25%"><?=$ldon_points_mmc?></td>
-                        <td align="center" width="25%"><?=$mmc_wins?></td>
-                        <td align="center" width="25%"><?=$mmc_losses?></td>
+                        <td align="center" width="25%"><?echo (isset($mmc_wins)) ? $mmc_wins : 0;?></td>
+                        <td align="center" width="25%"><?echo (isset($mmc_losses)) ? $mmc_losses : 0;?></td>
                       </tr>
                       <tr>
                         <td align="center" width="25%">RUJ:</td>
                         <td align="center" width="25%"><?=$ldon_points_ruj?></td>
-                        <td align="center" width="25%"><?=$ruj_wins?></td>
-                        <td align="center" width="25%"><?=$ruj_losses?></td>
+                        <td align="center" width="25%"><?echo (isset($ruj_wins)) ? $ruj_wins : 0;?></td>
+                        <td align="center" width="25%"><?echo (isset($ruj_losses)) ? $ruj_losses : 0;?></td>
                       </tr>
                       <tr>
                         <td align="center" width="25%">TAK:</td>
                         <td align="center" width="25%"><?=$ldon_points_tak?></td>
-                        <td align="center" width="25%"><?=$tak_wins?></td>
-                        <td align="center" width="25%"><?=$tak_losses?></td>
+                        <td align="center" width="25%"><?echo (isset($tak_wins)) ? $tak_wins : 0;?></td>
+                        <td align="center" width="25%"><?echo (isset($tak_losses)) ? $tak_losses : 0;?></td>
                       </tr>
                       <tr>
                         <td colspan="4">&nbsp;</td>
@@ -442,7 +444,7 @@
           <td colspan="2">
             <fieldset>
               <legend><strong>Inspect Message</strong></legend>
-              <?echo ($inspect_message) ? $inspect_message : "None";?>
+              <?echo (isset($inspect_message)) ? $inspect_message : "None";?>
             </fieldset>
           </td>
         </tr>
@@ -460,39 +462,39 @@
                           <td width="50%">
 <?
   for ($x = 0; $x <= 3; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
   for ($x = 6; $x <= 11; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
   for ($x = 15; $x <= 17; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
   for ($x = 19; $x <= 23; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
   for ($x = 25; $x <= 30; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
-  echo "32 - " . $skilltypes[32] . ": " . $skills[32] . "<br>";
+  echo "32 - " . $skilltypes[32] . ": " . (isset($skills[32]) ? $skills[32] : 0) . "<br>";
 ?>
                           </td>
                           <td width="50%" valign="top">
 <?
   for ($x = 33; $x <= 40; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
-  echo "48 - " . $skilltypes[48] . ": " . $skills[48] . "<br>";
+  echo "48 - " . $skilltypes[48] . ": " . (isset($skills[48]) ? $skills[48] : 0) . "<br>";
   for ($x = 50; $x <= 53; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
-  echo "55 - " . $skilltypes[55] . ": " . $skills[55] . "<br>";
-  echo "62 - " . $skilltypes[62] . ": " . $skills[62] . "<br>";
+  echo "55 - " . $skilltypes[55] . ": " . (isset($skills[55]) ? $skills[55] : 0) . "<br>";
+  echo "62 - " . $skilltypes[62] . ": " . (isset($skills[62]) ? $skills[62] : 0) . "<br>";
   for ($x = 66; $x <= 67; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
   for ($x = 71; $x <= 77; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
 ?>
                           </td>
@@ -505,25 +507,25 @@
                         <tr>
                           <td width="50%">
 <?
-  echo "4 - " . $skilltypes[4] . ": " . $skills[4] . "<br>";
-  echo "5 - " . $skilltypes[5] . ": " . $skills[5] . "<br>";
-  echo "13 - " . $skilltypes[13] . ": " . $skills[13] . "<br>";
-  echo "14 - " . $skilltypes[14] . ": " . $skills[14] . "<br>";
-  echo "18 - " . $skilltypes[18] . ": " . $skills[18] . "<br>";
-  echo "24 - " . $skilltypes[24] . ": " . $skills[24] . "<br>";
-  echo "31 - " . $skilltypes[31] . ": " . $skills[31] . "<br>";
+  echo "4 - " . $skilltypes[4] . ": " . (isset($skills[4]) ? $skills[4] : 0) . "<br>";
+  echo "5 - " . $skilltypes[5] . ": " . (isset($skills[5]) ? $skills[5] : 0) . "<br>";
+  echo "13 - " . $skilltypes[13] . ": " . (isset($skills[13]) ? $skills[13] : 0) . "<br>";
+  echo "14 - " . $skilltypes[14] . ": " . (isset($skills[14]) ? $skills[14] : 0) . "<br>";
+  echo "18 - " . $skilltypes[18] . ": " . (isset($skills[18]) ? $skills[18] : 0) . "<br>";
+  echo "24 - " . $skilltypes[24] . ": " . (isset($skills[24]) ? $skills[24] : 0) . "<br>";
+  echo "31 - " . $skilltypes[31] . ": " . (isset($skills[31]) ? $skills[31] : 0) . "<br>";
   for ($x = 43; $x <= 47; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
 ?>
                           </td>
                           <td width="50%" valign="top">
 <?
-  echo "12 - " . $skilltypes[12] . ": " . $skills[12] . "<br>";
-  echo "41 - " . $skilltypes[41] . ": " . $skills[41] . "<br>";
-  echo "49 - " . $skilltypes[49] . ": " . $skills[49] . "<br>";
-  echo "54 - " . $skilltypes[54] . ": " . $skills[54] . "<br>";
-  echo "70 - " . $skilltypes[70] . ": " . $skills[70] . "<br>";
+  echo "12 - " . $skilltypes[12] . ": " . (isset($skills[12]) ? $skills[12] : 0) . "<br>";
+  echo "41 - " . $skilltypes[41] . ": " . (isset($skills[41]) ? $skills[41] : 0) . "<br>";
+  echo "49 - " . $skilltypes[49] . ": " . (isset($skills[49]) ? $skills[49] : 0) . "<br>";
+  echo "54 - " . $skilltypes[54] . ": " . (isset($skills[54]) ? $skills[54] : 0) . "<br>";
+  echo "70 - " . $skilltypes[70] . ": " . (isset($skills[70]) ? $skills[70] : 0) . "<br>";
 ?>
                           </td>
                         </tr>
@@ -535,7 +537,7 @@
                       <legend><strong>Languages</strong></legend>
 <?
   for ($x = 0; $x <= 27; $x++) {
-    echo $x . " - " . $langtypes[$x] . ": " . $languages[$x] . "<br>";
+    echo $x . " - " . $langtypes[$x] . ": " . (isset($languages[$x]) ? $languages[$x] : 0) . "<br>";
   }
 ?>
                     </fieldset><br>
@@ -543,13 +545,13 @@
                       <legend><strong>Tradeskills</strong></legend>
 <?
   for ($x = 56; $x <= 61; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
   for ($x = 63; $x <= 65; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
   for ($x = 68; $x <= 69; $x++) {
-    echo $x . " - " . $skilltypes[$x] . ": " . $skills[$x] . "<br>";
+    echo $x . " - " . $skilltypes[$x] . ": " . (isset($skills[$x]) ? $skills[$x] : 0) . "<br>";
   }
 ?>
                     </fieldset>
@@ -568,23 +570,25 @@
                   <td width="50%">
                     <fieldset>
                       <legend><strong>Experience Mods</strong> (<a href="index.php?editor=player&playerid=<?=$playerid?>&action=8">Add</a>)</legend>
-<?if ($exp_mods):?>
+<?if (isset($exp_mods)):?>
                         <table width="100%">
                           <tr>
                             <td align="center"><u>Zone</u></td>
+                            <td align="center"><u>Version</u></td>
                             <td align="center"><u>Base EXP Mod</u></td>
                             <td align="center"><u>AA EXP Mod</u></td>
                             <td align="center">&nbsp;</td>
                           </tr>
 <?  foreach ($exp_mods as $exp_mod):?>
                           <tr>
-                            <td align="center"><?=getZoneName($exp_mod['zone_id'])?> (<?=$exp_mod['zone_id']?>)</td>
+                            <td align="center"><?=$exp_mod['zone_id'] == 0 ? "Global" : getZoneName($exp_mod['zone_id'])?> (<?=$exp_mod['zone_id']?>)</td>
+                            <td align="center"><?echo ($exp_mod['instance_version'] == -1) ? "All (-1)" : $exp_mod['instance_version'];?></td>
                             <td align="center"><?=$exp_mod['exp_modifier']?></td>
                             <td align="center"><?=$exp_mod['aa_modifier']?></td>
                             <td align="center">
                               <?echo ($exp_mod['exp_modifier'] == 0 && $exp_mod['aa_modifier'] == 0) ? "<img src='images\caution.gif' width='13' title='Zero values have no effect'>&nbsp;" : "";?>
-                              <a href="index.php?editor=player&playerid=<?=$exp_mod['character_id']?>&zoneid=<?=$exp_mod['zone_id']?>&action=9"><img src="images/edit2.gif" width="13"></a>&nbsp;
-                              <a href="index.php?editor=player&playerid=<?=$exp_mod['character_id']?>&zoneid=<?=$exp_mod['zone_id']?>&action=11"><img src="images/delete.gif" width="13"></a>
+                              <a href="index.php?editor=player&playerid=<?=$exp_mod['character_id']?>&zoneid=<?=$exp_mod['zone_id']?>&instance_version=<?=$exp_mod['instance_version']?>&action=9"><img src="images/edit2.gif" width="13"></a>&nbsp;
+                              <a href="index.php?editor=player&playerid=<?=$exp_mod['character_id']?>&zoneid=<?=$exp_mod['zone_id']?>&instance_version=<?=$exp_mod['instance_version']?>&action=11"><img src="images/delete.gif" width="13"></a>
                             </td>
                           </tr>
 <?  endforeach;?>
@@ -599,7 +603,7 @@
               </table>
             </fieldset>
           </td>
-        <tr>
+        </tr>
       </table>
     </div>
   </div>

@@ -1,20 +1,4 @@
-<?php
-
-$spelltypes = array(
-  1   => "Nuke",
-  2   => "Heal",
-  4   => "Root",
-  8   => "Buff",
-  16  => "Escape",
-  32  => "Pet",
-  64  => "Lifetap",
-  128 => "Snare",
-  256 => "DOT",
-  512 => "Dispel",
-  1024 => "In-Combat Buff",
-  2048 => "Mez",
-  4096 => "Charm"
-);
+<?
 
 switch($action) {
   case 0: // View NPC Spells
@@ -202,13 +186,22 @@ function spells_info() {
     $result = $mysql_content_db->query_assoc($query);
     $npc_spells_id = $result['npc_spells_id'];
   }
-  else $npc_spells_id = $spellset;
+  else {
+    $npc_spells_id = $spellset;
+  }
 
-  if ($npc_spells_id == 0) return array("npc_spells_id" => 0);
+  if ($npc_spells_id == 0) {
+    return array("npc_spells_id" => 0);
+  }
 
   $query = "SELECT * FROM npc_spells WHERE id=$npc_spells_id";
   $result = $mysql_content_db->query_assoc($query);
-  $array = $result;
+  if (!$result) {
+    return array("npc_spells_id" => 0);
+  }
+  else {
+   $array = $result;
+  }
 
   $array['proc_name'] = getSpellName($array['attack_proc']);
 

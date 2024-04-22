@@ -2,7 +2,7 @@
     <div class="table_header">
       <div style="float:right">
         <a onClick="javascript:alert('Not yet!');"><img src="images/c_table.gif" border="0" title="Edit this Account"></a>
-<?if ($character_array) {
+<?if (isset($character_array)) {
     echo '<a onClick="javascript:alert(\'Unable to delete account yet. Delete all characters associated with this account first!\');"><img src="images/table.gif" border="0" title="Characters Still Exist on this Account!"></a>';
   }
   else {
@@ -13,7 +13,7 @@
       <?=$id?> - <?echo trim($name);?>
     </div>
     <div class="table_content">
-<?if ($online) echo "<h2><center><font color='red'>WARNING! THIS ACCOUNT IS ONLINE...</font></center></h2>";?>
+<?if (isset($online)) echo "<h2><center><font color='red'>WARNING! THIS ACCOUNT IS ONLINE...</font></center></h2>";?>
       <table cellspacing="0" border="0" width="100%">
         <tr>
           <td width="100%">
@@ -28,6 +28,9 @@
                     Password: <?=$password?><br>
                     <a href="index.php?editor=account&acctid=<?=$id?>&action=7" title="Edit Account Status">Status</a>: <?=$status?><br>
                     GM Speed: <?=$yesno[$gmspeed]?><br>
+                    Invulnerable: <?=$yesno[$invulnerable]?><br>
+                    Fly Mode: <?=$flymode?><br>
+                    Ignore Tells: <?=$yesno[$ignore_tells]?><br>
                     Hide Me: <?=$yesno[$hideme]?><br>
                     Revoked: <?=$yesno[$revoked]?><br>
                     Karma: <?=$karma?><br>
@@ -50,7 +53,7 @@
                         <td width="40%"><center>Last Login</center></td>
                       </tr>
 <?
-  if ($ips) {
+  if (isset($ips)) {
     foreach ($ips as $ip_address) {
       echo '<tr>';
       echo '<td width="40%"><center><a href="index.php?editor=account&ip=' . $ip_address['ip'] . '&action=9">' . $ip_address['ip'] . '</a></center></td>';
@@ -69,7 +72,7 @@
                   <fieldset>
                     <legend><strong>Characters</strong></legend>
 <?
-  if ($characters) {
+  if (isset($characters)) {
     $count = 0;
     echo '<table cellspacing="0" border="0" width="100%">';
     foreach ($characters as $character) {
@@ -90,6 +93,7 @@
   echo '<br>';
 ?>
                     Last Character Used: <?echo ($charname != '') ? $charname : 'Never Logged a Character';?><br>
+                    Auto-Login Character: <?echo ($auto_login_charname != '') ? $auto_login_charname : 'None';?>
                   </fieldset>
                 </td>
               </tr>

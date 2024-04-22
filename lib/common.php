@@ -5,7 +5,13 @@ function getNPCName($npcid) {
   
   $query = "SELECT name FROM npc_types WHERE id=$npcid";
   $result = $mysql_content_db->query_assoc($query);
-  return $result['name'];
+
+  if ($result) {
+    return $result['name'];
+  }
+  else {
+    return "N/A";
+  }
 }
 
 function getZoneLongName($short_name, $version=0) {
@@ -13,7 +19,13 @@ function getZoneLongName($short_name, $version=0) {
 
   $query = "SELECT long_name FROM zone WHERE short_name=\"$short_name\" AND version=$version";
   $result = $mysql_content_db->query_assoc($query);
-  return $result['long_name'];
+
+  if ($result) {
+    return $result['long_name'];
+  }
+  else {
+    return "N/A";
+  }
 }
 
 function getZoneID($short_name) {
@@ -21,6 +33,7 @@ function getZoneID($short_name) {
 
   $query = "SELECT zoneidnumber AS id FROM zone WHERE short_name=\"$short_name\"";
   $result = $mysql_content_db->query_assoc($query);
+
   if ($result) {
     return $result['id'];
   }
@@ -34,7 +47,13 @@ function getZoneIDByName($short_name) {
 
   $query = "SELECT id FROM zone WHERE short_name=\"$short_name\"";
   $result = $mysql_content_db->query_assoc($query);
-  return $result['id'];
+
+  if ($result) {
+    return $result['id'];
+  }
+  else {
+    return 0;
+  }
 }
 
 function getZoneName($zoneidnumber) {
@@ -42,7 +61,13 @@ function getZoneName($zoneidnumber) {
 
   $query = "SELECT short_name FROM zone WHERE zoneidnumber=\"$zoneidnumber\"";
   $result = $mysql_content_db->query_assoc($query);
-  return $result['short_name'];
+
+  if ($result) {
+    return $result['short_name'];
+  }
+  else {
+    return "N/A";
+  }
 }
 
 function getZoneVersion($zoneid) {
@@ -51,7 +76,12 @@ function getZoneVersion($zoneid) {
   $query = "SELECT version FROM zone WHERE id = \"$zoneid\"";
   $result = $mysql_content_db->query_assoc($query);
 
-  return $result['version'];
+  if ($result) {
+    return $result['version'];
+  }
+  else {
+    return 0;
+  }
 }
 
 function searchItems($search) {
@@ -121,7 +151,7 @@ function get_faction_standing($value) {
     case $value >= -750:
       return "Threatening";
     case $value < -750:
-      return "KOS";
+      return "Scowls";
     default:
       return "UNK";
   }
@@ -129,9 +159,16 @@ function get_faction_standing($value) {
 
 function getTaskTitle($tskid) {
   global $mysql_content_db;
+
   $query = "SELECT title FROM tasks WHERE id=$tskid";
   $result = $mysql_content_db->query_assoc($query);
-  return $result['title'];
+
+  if ($result) {
+    return $result['title'];
+  }
+  else {
+    return "UNK";
+  }
 }
 
 function getRecipeName($id) {
@@ -187,7 +224,7 @@ function check_admin_authorization() {
 
 function search_npc_by_id() {
   global $mysql_content_db;
-  $npcid = $_GET['npcid'];
+  $npcid = $_GET['npc_id'];
 
   $query = "SELECT id, name FROM npc_types WHERE id=\"$npcid\"";
   $results = $mysql_content_db->query_mult_assoc($query);
@@ -269,11 +306,11 @@ function getPlayerName($playerid) {
       return $result['name'];
     }
     else {
-      return "";
+      return "N/A";
     }
   }
   else {
-    return "";
+    return "N/A";
   }
 }
 
@@ -349,7 +386,13 @@ function getAccountName($acctid) {
   
   $query = "SELECT name FROM account WHERE id=$acctid";
   $result = $mysql->query_assoc($query);
-  return $result['name'];
+
+  if ($result) {
+    return $result['name'];
+  }
+  else {
+    return null;
+  }
 }
 
 function getAccountID($lsname) {
@@ -534,6 +577,8 @@ function delete_player($playerid) {
   $mysql->query_no_result($query);
   $query = "DELETE FROM character_inspect_messages WHERE id=$playerid";
   $mysql->query_no_result($query);
+  $query = "DELETE FROM character_instance_safereturns WHERE character_id=$playerid";
+  $mysql->query_no_result($query);
   //character_item_recast?
   $query = "DELETE FROM character_languages WHERE id=$playerid";
   $mysql->query_no_result($query);
@@ -554,6 +599,8 @@ function delete_player($playerid) {
   $mysql->query_no_result($query);
   $query = "DELETE FROM character_spells WHERE id=$playerid";
   $mysql->query_no_result($query);
+  $query = "DELETE FROM character_task_timers WHERE character_id=$playerid";
+  $mysql->query_no_result($query);
   $query = "DELETE FROM character_tasks WHERE charid=$playerid";
   $mysql->query_no_result($query);
   $query = "DELETE FROM character_tribute WHERE id=$playerid";
@@ -567,11 +614,10 @@ function delete_player($playerid) {
   $mysql->query_no_result($query);
   $query = "DELETE FROM friends WHERE charid=$playerid";
   $mysql->query_no_result($query);
-  $query = "DELETE FROM group_id WHERE charid=$playerid";
+  $query = "DELETE FROM group_id WHERE character_id=$playerid";
   $mysql->query_no_result($query);
   $query = "DELETE FROM guild_members WHERE char_id=$playerid";
   $mysql->query_no_result($query);
-  //hackers?
   $query = "DELETE FROM instance_list_player WHERE charid=$playerid";
   $mysql->query_no_result($query);
   $query = "DELETE FROM inventory WHERE charid=$playerid";
@@ -611,8 +657,6 @@ function delete_account($acctid) {
   $mysql->query_no_result($query);
   $query = "DELETE FROM account_rewards WHERE account_id=$acctid";
   $mysql->query_no_result($query);
-  $query = "DELETE FROM eventlog WHERE accountid=$acctid";
-  $mysql->query_no_result($query);
   $query = "DELETE FROM gm_ips WHERE account_id=$acctid";
   $mysql->query_no_result($query);
   $query = "DELETE FROM sharedbank WHERE acctid=$acctid";
@@ -622,10 +666,15 @@ function delete_account($acctid) {
 function get_currency_name($curr_id) {
   global $mysql_content_db;
 
-  $query = "SELECT a.item_id, i.name FROM alternate_currency a, items i WHERE a.item_id=i.id AND a.id=$curr_id";
+  $query = "SELECT a.item_id AS id, i.name AS `name` FROM alternate_currency a, items i WHERE a.item_id=i.id AND a.id=$curr_id LIMIT 1";
   $result = $mysql_content_db->query_assoc($query);
 
-  return $result['name'];
+  if ($result) {
+    return $result['name'];
+  }
+  else {
+    return "Item not in DB";
+  }
 }
 
 function factions_array() {
@@ -773,6 +822,34 @@ function isValidLoot($loottable_id) {
   }
   else {
     return false;
+  }
+}
+
+function get_tribute_name($id) {
+  global $mysql_content_db;
+
+  $query = "SELECT `name` FROM tributes WHERE id=$id";
+  $result = $mysql_content_db->query_assoc($query);
+
+  if ($result) {
+    return $result['name'];
+  }
+  else {
+    return null;
+  }
+}
+
+function get_tribute_cost_by_tier($id, $tier) {
+  global $mysql_content_db;
+
+  $query = "SELECT cost FROM tribute_levels WHERE tribute_id=$id ORDER BY level, cost";
+  $result = $mysql_content_db->query_mult_assoc($query);
+
+  if ($result) {
+    return $result[$tier]['cost'];
+  }
+  else {
+    return null;
   }
 }
 

@@ -7,25 +7,6 @@ $bugstatus = array(
   3   => "Moved"
 );
 
-$flags = array(
-  0   => "None",
-  1   => "Duplicate",
-  2   => "Crash",
-  3   => "Duplicate/Crash",
-  4   => "Target",
-  5   => "Duplicate/Target",
-  6   => "Crash/Target",
-  7   => "Duplicate/Crash/Target",
-  8   => "Flags",
-  9   => "Duplicate/Flags",
-  10  => "Crash/Flags",
-  11  => "Duplicate/Crash/Flags",
-  12  => "Target/Flags",
-  13  => "Duplicate/Target/Flags",
-  14  => "Crash/Target/Flags",
-  15  => "Duplicate/Crash/Target/Flags"
-);
-
 $default_page = 1;
 $default_size = 50;
 $default_sort = 1;
@@ -33,20 +14,20 @@ $default_sort = 1;
 $columns = array(
   1 => 'id',
   2 => 'zone',
-  3 => 'name',
-  4 => 'type',
-  5 => 'target',
-  6 => 'date',
-  7 => 'status'
+  3 => 'character_name',
+  4 => 'category_name',
+  5 => 'target_name',
+  6 => 'report_datetime',
+  7 => 'bug_status'
 );
 
 $columns1 = array(
   1 => 'id',
-  2 => 'account',
-  3 => 'name',
-  4 => 'zone',
-  5 => 'date',
-  6 => 'hacked'
+  2 => 'account_id',
+  3 => 'character_id',
+  4 => 'zone_id',
+  5 => 'event_type_name',
+  6 => 'created_at'
 );
 
 switch ($action) {
@@ -63,11 +44,9 @@ switch ($action) {
     $body = new Template("templates/server/bugs.tmpl.php");
     $body->set("bugstatus", $bugstatus);
     $bugs = get_open_bugs($curr_page, $curr_size, $curr_sort);
-    $page_stats = getPageInfo("bugs", FALSE, $curr_page, $curr_size, ((isset($_GET['sort'])) ? $_GET['sort'] : null), "status = 0");
+    $page_stats = getPageInfo("bug_reports", FALSE, $curr_page, $curr_size, ((isset($_GET['sort'])) ? $_GET['sort'] : null), "bug_status=0");
     if ($bugs) {
-      foreach ($bugs as $key=>$value) {
-        $body->set($key, $value);
-      }
+      $body->set("bugs", $bugs);
       foreach ($page_stats as $key=>$value) {
         $body->set($key, $value);
       }
@@ -79,27 +58,27 @@ switch ($action) {
     break;
   case 2: // View Bug
     check_authorization();
-    $breadcrumbs .= " >> Bug Details";
+    $breadcrumbs .= " >> <a href='index.php?editor=server&action=1'>Bug Reports</a> >> Bug Details";
     $javascript = new Template("templates/server/js.tmpl.php");
-    $body = new Template("templates/server/bugs.view.tmpl.php");
+    $body = new Template("templates/server/bug.view.tmpl.php");
     $body->set("bugstatus", $bugstatus);
     $body->set("flags", $flags);
-    $bugs = view_bugs();
-    if ($bugs) {
-      foreach ($bugs as $key=>$value) {
+    $bug = get_bug($_GET['id']);
+    if ($bug) {
+      foreach ($bug as $key=>$value) {
         $body->set($key, $value);
       }
     }
     break;
-   case 3: // Update Bug
+  case 3: // Update Bug
     check_authorization();
-    update_bugs();
+    update_bug_status();
     if ($_POST['notify']) {
-      notify_status($bugstatus[$_POST['status']]);
+      notify_status($bugstatus[$_POST['bug_status']]);
     }
     header("Location: index.php?editor=server&action=1");
     exit;
-   case 4: // View Resolved Bugs
+  case 4: // View Resolved Bugs
     check_authorization();
     $breadcrumbs .= " >> Resolved Bugs";
     $curr_page = (isset($_GET['page'])) ? $_GET['page'] : $default_page;
@@ -108,11 +87,9 @@ switch ($action) {
     $body = new Template("templates/server/bugs.resolved.tmpl.php");
     $body->set("bugstatus", $bugstatus);
     $bugs = get_resolved_bugs($curr_page, $curr_size, $curr_sort);
-    $page_stats = getPageInfo("bugs", FALSE, $curr_page, $curr_size, ((isset($_GET['sort'])) ? $_GET['sort'] : null), "status != 0");
+    $page_stats = getPageInfo("bug_reports", FALSE, $curr_page, $curr_size, ((isset($_GET['sort'])) ? $_GET['sort'] : null), "bug_status != 0");
     if ($bugs) {
-      foreach ($bugs as $key=>$value) {
-        $body->set($key, $value);
-      }
+      $body->set("bugs", $bugs);
       foreach ($page_stats as $key=>$value) {
         $body->set($key, $value);
       }
@@ -122,33 +99,33 @@ switch ($action) {
       $body->set('pages', 0);
     }
     break;
-   case 5: // Delete Bug
+  case 5: // Delete Bug
     check_authorization();
-    delete_bugs();
+    delete_bug($_GET['id']);
     header("Location: index.php?editor=server&action=4");
     exit;
-   case 6: // Preview Hackers
-    check_admin_authorization();
-    $breadcrumbs .= " >> Hackers";
-    $javascript = new Template("templates/server/js.tmpl.php");
+  case 6: // Event Logs
+    check_authorization();
+    $breadcrumbs .= " >> Player Event Logs";
+    $body = new Template("templates/server/player.events.view.tmpl.php");
+
     $curr_page = (isset($_GET['page'])) ? $_GET['page'] : $default_page;
     $curr_size = (isset($_GET['size'])) ? $_GET['size'] : $default_size;
     $curr_sort = (isset($_GET['sort'])) ? $columns1[$_GET['sort']] : $columns1[$default_sort];
+
     if (isset($_GET['filter']) && $_GET['filter'] == 'on') {
       $filter = build_filter();
     }
-    $body = new Template("templates/server/hackers.tmpl.php");
-    $page_stats = getPageInfo("hackers", FALSE, $curr_page, $curr_size, ((isset($_GET['sort'])) ? $_GET['sort'] : null), ((isset($filter)) ? $filter['sql'] : null));
+
+    $page_stats = getPageInfo("player_event_logs", FALSE, $curr_page, $curr_size, ((isset($_GET['sort'])) ? $_GET['sort'] : null), ((isset($filter)) ? $filter['sql'] : null));
     if (isset($filter)) {
       $body->set('filter', $filter);
     }
     if ($page_stats['page']) {
-      $hackers = get_hackers($page_stats['page'], $curr_size, $curr_sort, ((isset($filter)) ? $filter['sql'] : null));
+      $events = get_player_event_logs($page_stats['page'], $curr_size, $curr_sort, ((isset($filter)) ? $filter['sql'] : null));
     }
-    if (isset($hackers)) {
-      foreach ($hackers as $key=>$value) {
-        $body->set($key, $value);
-      }
+    if (isset($events)) {
+      $body->set('events', $events);
       foreach ($page_stats as $key=>$value) {
         $body->set($key, $value);
       }
@@ -158,24 +135,21 @@ switch ($action) {
       $body->set('pages', 0);
     }
     break;
-   case 7: // Delete Hacker
-    check_admin_authorization();
-    delete_hacker();
-    $return_address = $_SERVER['HTTP_REFERER'];
-    header("Location: $return_address");
-    exit;
-   case 8: // View Hacker
-    check_admin_authorization();
-    $breadcrumbs .= " >> " . "<a href='index.php?editor=server&action=6'>" . "Hackers</a> >> Hacker Details";
-    $body = new Template("templates/server/hackers.view.tmpl.php");
-    $hackers = view_hackers();
-    if ($hackers) {
-      foreach ($hackers as $key=>$value) {
-        $body->set($key, $value);
-       }
-     }
+  case 7: // View Event
+    check_authorization();
+    $breadcrumbs .= " >> <a href='index.php?editor=server&action=6'>Player Event Logs</a> >> Event";
+    $body = new Template("templates/server/player.event.view.tmpl.php");
+    $event = get_player_event($_GET['id']);
+    if ($event) {
+      $body->set('event', $event);
+    }
     break;
-   case 9: // Preview Reports
+  case 8: // Delete Event
+    check_authorization();
+    delete_player_event($_GET['id']);
+    header("Location: index.php?editor=server&action=6");
+    exit;
+  case 9: // Preview Reports
     check_authorization();
     $breadcrumbs .= " >> Reports";
     $body = new Template("templates/server/reports.tmpl.php");
@@ -186,12 +160,12 @@ switch ($action) {
       }
     }
     break;
-   case 10: // Delete Report
+  case 10: // Delete Report
     check_admin_authorization();
     delete_report();
     header("Location: index.php?editor=server&action=9");
     exit;
-   case 11: // View Report
+  case 11: // View Report
     check_authorization();
     $breadcrumbs .= " >> " . "<a href='index.php?editor=server&action=9'>" . "Reports</a> >> Report Details";
     $body = new Template("templates/server/reports.view.tmpl.php");
@@ -459,19 +433,16 @@ switch ($action) {
     $body = new Template("templates/server/variables.tmpl.php");
     $variables = get_variables();
     if ($variables) {
-      foreach ($variables as $key=>$value) {
-        $body->set($key, $value);
-      }
+      $body->set('variables', $variables);
     }
     break;
   case 44: // Edit Variable
     check_admin_authorization();
     $breadcrumbs .= " >> " . "<a href='index.php?editor=server&action=43'>" . "Variables</a> >> Variable Editor";
     $body = new Template("templates/server/variables.edit.tmpl.php");
-    $body->set('varname', $_GET['varname']);
-    $variables = view_variable();
-    if ($variables) {
-      foreach ($variables as $key=>$value) {
+    $variable = view_variable($_GET['id']);
+    if ($variable) {
+      foreach ($variable as $key=>$value) {
         $body->set($key, $value);
       }
     }
@@ -481,20 +452,20 @@ switch ($action) {
     update_variable();
     header("Location: index.php?editor=server&action=43");
     exit;    
-  case 46: // Create Variable
+  case 46: // Add Variable
     check_admin_authorization();
     $breadcrumbs .= " >> " . "<a href='index.php?editor=server&action=43'>" . "Variables</a> >> Create Variable";
     $body = new Template("templates/server/variables.add.tmpl.php");
+    $body->set('id', suggest_variable_id());
     break;
-  case 47: // Add Variable
+  case 47: // Insert Variable
     check_admin_authorization();
     add_variable();
     header("Location: index.php?editor=server&action=43");
     exit;
   case 48: // Delete Variable
     check_admin_authorization();
-    delete_variable();
-    $varname = $_GET['varname'];
+    delete_variable($_GET['id']);
     header("Location: index.php?editor=server&action=43");
     exit;
   case 49: // Delete Multiple Hacks
@@ -556,7 +527,7 @@ switch ($action) {
       $body->set('classes', $classes);
       $body->set('deities', $deities);
       $body->set('zoneids', $zoneids);
-      $body->set('expansions', $eqexpansions);
+      $body->set('expansions', $expansions2_short);
     }
     break;
   case 57: // View Character Base Data
@@ -647,21 +618,98 @@ switch ($action) {
     delete_scheduled_event($_GET['id']);
     header("Location: index.php?editor=server&action=64");
     exit;
+  case 70: // Add Character Creation Combo
+    check_authorization();
+    $breadcrumbs .= " >> <a href='index.php?editor=server&action=56'>Character Creation Combos</a> >> Add Combo";
+    $body = new Template("templates/server/charcreatecombo.edit.tmpl.php");
+      $body->set('combo', $combo);
+      $body->set('races', $races);
+      $body->set('classes', $classes);
+      $body->set('deities', $deities);
+      $body->set('zoneids', $zoneids);
+      $body->set('expansions', $expansions2_long);
+    break;
+  case 72: // Edit Character Creation Combo
+    check_authorization();
+    $breadcrumbs .= " >> <a href='index.php?editor=server&action=56'>Character Creation Combos</a> >> Edit Combo";
+    $body = new Template("templates/server/charcreatecombo.edit.tmpl.php");
+    $combo = get_char_create_combo($_GET['race'], $_GET['class'], $_GET['deity'], $_GET['start_zone']);
+    if ($combo) {
+      $body->set('combo', $combo);
+      $body->set('races', $races);
+      $body->set('classes', $classes);
+      $body->set('deities', $deities);
+      $body->set('zoneids', $zoneids);
+      $body->set('expansions', $expansions2_long);
+   }
+    break;
+  case 73: // Update Character Creation Combo
+    check_authorization();
+    replace_char_create_combo();
+    header("Location: index.php?editor=server&action=56");
+    exit;
+  case 74: // Delete Character Creation Combo
+    check_authorization();
+    delete_char_create_combo($_GET['race'], $_GET['class'], $_GET['deity'], $_GET['start_zone']);
+    header("Location: index.php?editor=server&action=56");
+    exit;
+  case 75: // Add Bug Review
+    check_authorization();
+    $id = $_GET['id'];
+    add_bug_review();
+    header("Location: index.php?editor=server&id=$id&action=2");
+    exit;
+  case 76: // View Event Log Settings
+    check_authorization();
+    $breadcrumbs .= " >> <a href='index.php?editor=server&action=6'>Player Event Logs</a> >> Settings";
+    $body = new Template("templates/server/player.event.log.settings.view.tmpl.php");
+    $settings = get_player_event_log_settings();
+    if ($settings) {
+      $body->set('settings', $settings);
+      $body->set('yesno', $yesno);
+    }
+    break;
+  case 77: // Add Event Log Setting
+    check_authorization();
+    $breadcrumbs .= " >> <a href='index.php?editor=server&action=6'>Player Event Logs</a> >> <a href='index.php?editor=server&action=76'>Settings</a> >> Add Setting";
+    $body = new Template("templates/server/player.event.log.setting.add.tmpl.php");
+    $body->set('suggest_id', suggest_player_event_log_setting_id());
+    break;
+  case 78: // Insert Event Log Setting
+    check_authorization();
+    insert_player_event_log_setting();
+    header("Location: index.php?editor=server&action=76");
+    exit;
+  case 79: // Edit Event Log Setting
+    check_authorization();
+    $breadcrumbs .= " >> <a href='index.php?editor=server&action=6'>Player Event Logs</a> >> <a href='index.php?editor=server&action=76'>Settings</a> >> Edit Setting";
+    $body = new Template("templates/server/player.event.log.setting.edit.tmpl.php");
+    $setting = get_player_event_log_setting($_GET['id']);
+    if ($setting) {
+      $body->set('setting', $setting);
+    }
+    break;
+  case 80: // Update Event Log Setting
+    check_authorization();
+    header("Location: index.php?editor=server&action=76");
+    update_player_event_log_setting();
+    exit;
+  case 81: // Delete Event Log Setting
+    check_authorization();
+    delete_player_event_log_setting($_GET['id']);
+    header("Location: index.php?editor=server&action=76");
+    exit;
 }
 
 function get_open_bugs($page_number, $results_per_page, $sort_by) {
   global $mysql;
   $limit = ($page_number - 1) * $results_per_page . "," . $results_per_page;
 
-  $query = "SELECT id, zone, name, ui, x, y, z, type, flag, target, bug, date, status FROM bugs WHERE status = 0 ORDER BY $sort_by LIMIT $limit";
-  $result = $mysql->query_mult_assoc($query);
-  if ($result) {
-    foreach ($result as $result) {
-      $array['bugs'][$result['id']] = array("bid"=>$result['id'], "zone"=>$result['zone'], "name"=>$result['name'], "ui"=>$result['ui'], "x"=>$result['x'], "y"=>$result['y'], "z"=>$result['z'], "type"=>$result['type'], "flag"=>$result['flag'], "target"=>$result['target'], "bug"=>$result['bug'], "date"=>$result['date'], "status"=>$result['status']);
-    }
-  }
-  if (isset($array)) {
-    return $array;
+  $query = "SELECT * FROM bug_reports WHERE bug_status=0 ORDER BY $sort_by LIMIT $limit";
+  $results = $mysql->query_mult_assoc($query);
+
+  if ($results) {
+    return $results;
   }
   else {
     return null;
@@ -672,38 +720,11 @@ function get_resolved_bugs($page_number, $results_per_page, $sort_by) {
   global $mysql;
   $limit = ($page_number - 1) * $results_per_page . "," . $results_per_page;
 
-  $query = "SELECT id, zone, name, ui, x, y, z, type, flag, target, bug, date, status FROM bugs WHERE status != 0 ORDER BY $sort_by LIMIT $limit";
-  $result = $mysql->query_mult_assoc($query);
-  if ($result) {
-    foreach ($result as $result) {
-      $array['bugs'][$result['id']] = array("bid"=>$result['id'], "zone"=>$result['zone'], "name"=>$result['name'], "ui"=>$result['ui'], "x"=>$result['x'], "y"=>$result['y'], "z"=>$result['z'], "type"=>$result['type'], "flag"=>$result['flag'], "target"=>$result['target'], "bug"=>$result['bug'], "date"=>$result['date'], "status"=>$result['status']);
-    }
-  }
-  if (isset($array)) {
-    return $array;
-  }
-  else {
-    return null;
-  }
-}
+  $query = "SELECT * FROM bug_reports WHERE bug_status != 0 ORDER BY $sort_by LIMIT $limit";
+  $results = $mysql->query_mult_assoc($query);
 
-function get_hackers($page_number, $results_per_page, $sort_by, $where = "") {
-  global $mysql;
-  $limit = ($page_number - 1) * $results_per_page . "," . $results_per_page;
-
-  $query = "SELECT id, account, name, hacked, zone, date FROM hackers";
-  if ($where) {
-    $query .= " WHERE $where";
-  }
-  $query .= " ORDER BY $sort_by LIMIT $limit";
-  $result = $mysql->query_mult_assoc($query);
-  if ($result) {
-    foreach ($result as $result) {
-      $array['hackers'][$result['id']] = array("hid"=>$result['id'], "account"=>$result['account'], "name"=>$result['name'], "hacked"=>$result['hacked'], "date"=>$result['date'], "zone"=>$result['zone']);
-    }
-  }
-  if (isset($array)) {
-    return $array;
+  if ($results) {
+    return $results;
   }
   else {
     return null;
@@ -832,37 +853,29 @@ function get_launchers() {
 function get_variables() {
   global $mysql;
 
-  $query = "SELECT varname, value FROM variables";
+  $query = "SELECT * FROM variables";
   $results = $mysql->query_mult_assoc($query);
 
   if ($results) {
-    foreach ($results as $result) {
-      $array['variables'][$result['varname']] = array("varname"=>$result['varname'], "value"=>$result['value']);
-    }
+    return $results;
   }
-  return $array;
+  else {
+    return null;
+  }
 }
 
-function view_bugs() {
+function get_bug($id) {
   global $mysql;
 
-  $bid = $_GET['bid'];
-
-  $query = "SELECT id AS bid, zone, name, ui, x, y, z, type, flag, target, bug, date, status FROM bugs where id = \"$bid\"";
+  $query = "SELECT * FROM bug_reports WHERE id=$id";
   $result = $mysql->query_assoc($query);
-  
-  return $result;
-}
 
-function view_hackers() {
-  global $mysql;
-
-  $hid = $_GET['hid'];
-
-  $query = "SELECT id AS hid, account, name, hacked, zone, date FROM hackers where id = \"$hid\"";
-  $result = $mysql->query_assoc($query);
-  
-  return $result;
+  if ($result) {
+    return $result;
+  }
+  else {
+    return null;
+  }
 }
 
 function view_reports() {
@@ -942,24 +955,27 @@ function view_launcher() {
   return $result;
 }
 
-function view_variable() {
+function view_variable($id) {
   global $mysql;
 
-  $varname = $_GET['varname'];
-
-  $query = "SELECT * FROM variables WHERE varname=\"$varname\"";
+  $query = "SELECT * FROM variables WHERE id=$id";
   $result = $mysql->query_assoc($query);
   
-  return $result;
+  if ($result) {
+    return $result;
+  }
+  else {
+    return null;
+  }
 }
 
-function update_bugs() {
+function update_bug_status() {
   global $mysql;
 
-  $bid = $_POST['bid'];
-  $status = $_POST['status'];
+  $id = $_POST['id'];
+  $bug_status = $_POST['bug_status'];
 
-  $query = "UPDATE bugs SET status=\"$status\" WHERE id=\"$bid\"";
+  $query = "UPDATE bug_reports SET bug_status=$bug_status WHERE id=$id";
   $mysql->query_no_result($query);
 }
 
@@ -1030,30 +1046,20 @@ function update_launcher() {
 function update_variable() {
   global $mysql;
 
+  $id = $_POST['id'];
   $varname = $_POST['varname'];
   $value = $mysql->real_escape_string($_POST['value']); 
-  $information = $_POST['information'];
+  $information = $mysql->real_escape_string($_POST['information']);
   $ts = $_POST['ts'];
 
-  $query = "UPDATE variables SET varname=\"$varname\", value=\"$value\", information=\"$information\", ts=\"$ts\" WHERE varname=\"$varname\"";
+  $query = "UPDATE variables SET varname=\"$varname\", value=\"$value\", information=\"$information\", ts=\"$ts\" WHERE id=$id";
   $mysql->query_no_result($query);
 }
 
-function delete_bugs() {
+function delete_bug($id) {
   global $mysql;
 
-  $bid = $_GET['bid'];
-
-  $query = "DELETE FROM bugs WHERE id=\"$bid\"";
-  $mysql->query_no_result($query);
-}
-
-function delete_hacker() {
-  global $mysql;
-
-  $hid = $_GET['hid'];
-
-  $query = "DELETE FROM hackers WHERE id=\"$hid\"";
+  $query = "DELETE FROM bug_reports WHERE id=$id";
   $mysql->query_no_result($query);
 }
 
@@ -1114,12 +1120,10 @@ function delete_launcher() {
   $mysql->query_no_result($query);
 }
 
-function delete_variable() {
+function delete_variable($id) {
   global $mysql;
 
-  $varname = $_GET['varname'];
-
-  $query = "DELETE FROM variables WHERE varname=\"$varname\"";
+  $query = "DELETE FROM variables WHERE id=$id";
   $mysql->query_no_result($query);
 }
 
@@ -1169,12 +1173,13 @@ function add_launcher() {
 function add_variable() {
   global $mysql;
 
+  $id = $_POST['id'];
   $varname = $_POST['varname'];
   $value = $mysql->real_escape_string($_POST['value']); 
-  $information = $_POST['information'];
+  $information = $mysql->real_escape_string($_POST['information']);
   $ts = $_POST['ts'];
 
-  $query = "INSERT INTO variables SET varname=\"$varname\", value=\"$value\", information=\"$information\", ts=\"$ts\"";
+  $query = "INSERT INTO variables SET id=$id, varname=\"$varname\", value=\"$value\", information=\"$information\", ts=\"$ts\"";
   $mysql->query_no_result($query);
 }
 
@@ -1210,77 +1215,38 @@ function suggest_launcher() {
   return $result['name'];
 }
 
+function suggest_variable_id() {
+  global $mysql;
+
+  $query = "SELECT MAX(id) AS id FROM variables;";
+  $result = $mysql->query_assoc($query);
+
+  if ($result) {
+    return $result['id'] + 1;
+  }
+  else {
+    return 1;
+  }
+}
+
 function notify_status($new_status) {
   global $mysql;
 
-  $bid = $_POST['bid'];
-  $bug_date = $_POST['bug_date'];
-  $bug = $_POST['bug'];
+  $id = $_POST['id'];
+  $report_datetime = $_POST['report_datetime'];
+  $bug_report = $_POST['bug_report'];
   $from = "SYSTEM";
-  $to = $_POST['name'];
-  $charid = getPlayerID($_POST['name']);
+  $to = $_POST['character_name'];
+  $character_id = $_POST['character_id'];
   $subject = "Bug Report Status Update";
   $note = $_POST['optional_note'];
-  $body = "This is a system generated message to notify you that the status of your bug report has changed.\nDo not reply to this message.\n\nBug ID: " . $bid . "\nNew Status: " . $new_status . "\nBug Date: " . $bug_date . "\nBug: " . $bug;
+  $body = "This is a system generated message to notify you that the status of your bug report has changed.\nDo not reply to this message.\n\nBug ID: " . $id . "\nNew Status: " . $new_status . "\nBug Date: " . $report_datetime . "\nBug: " . $bug_report;
   if ($note) {
     $body .= "\nAdmin Note: " . $note;
   }
 
-  $query = "INSERT INTO mail (`charid`,`timestamp`,`from`,`subject`,`body`,`to`,`status`) VALUES ($charid,UNIX_TIMESTAMP(NOW()),\"$from\",\"$subject\",\"$body\",\"$to\",1)";
+  $query = "INSERT INTO mail (`charid`, `timestamp`, `from`, `subject`, `body`, `to`, `status`) VALUES ($character_id, UNIX_TIMESTAMP(NOW()), \"$from\", \"$subject\", \"$body\", \"$to\", 1)";
   $mysql->query_no_result($query);
-}
-
-function build_filter() {
-  $filter1 = $_GET['filter1'];
-  $filter2 = $_GET['filter2'];
-  $filter3 = $_GET['filter3'];
-  $filter4 = $_GET['filter4'];
-  $filter_final = array();
-
-  if ($filter1) { // Filter by account
-    $filter_account = "account LIKE '%" . $filter1 . "%'";
-    $filter_final['sql'] = $filter_account;
-  }
-  if ($filter2) { // Filter by name
-    $filter_name = "name LIKE '%" . $filter2 . "%'";
-    if ($filter_final['sql']) {
-      $filter_final['sql'] .= " AND ";
-    }
-    $filter_final['sql'] .= $filter_name;
-  }
-  if ($filter3) { // Filter by zone
-    $filter_zone = "zone LIKE '%" . $filter3 . "%'";
-    if ($filter_final['sql']) {
-      $filter_final['sql'] .= " AND ";
-    }
-    $filter_final['sql'] .= $filter_zone;
-  }
-  if ($filter4) { // Filter by hack
-    $filter_hack = "hacked LIKE '%" . $filter4 . "%'";
-    if ($filter_final['sql']) {
-      $filter_final['sql'] .= " AND ";
-    }
-    $filter_final['sql'] .= $filter_hack;
-  }
-
-  $filter_final['url'] = "&filter=on&filter1=$filter1&filter2=$filter2&filter3=$filter3&filter4=$filter4";
-  $filter_final['status'] = "on";
-  $filter_final['filter1'] = $filter1;
-  $filter_final['filter2'] = $filter2;
-  $filter_final['filter3'] = $filter3;
-  $filter_final['filter4'] = $filter4;
-
-  return $filter_final;
-}
-
-function delete_multiple_hacks() {
-  global $mysql;
-  $hacks = $_POST['cb_delete'];
-
-  foreach ($hacks as $hack) {
-    $query = "DELETE FROM hackers WHERE id=$hack";
-    $mysql->query_no_result($query);
-  }
 }
 
 function get_bannedips() {
@@ -1507,8 +1473,18 @@ function insert_scheduled_event() {
   $created_at = $_POST['created_at'];
   $deleted_at = $_POST['deleted_at'];
 
-  $query = "INSERT INTO server_scheduled_events SET id=$id, description='$description', event_type='$event_type', event_data='$event_data', minute_start=$minute_start, hour_start=$hour_start, day_start=$day_start, month_start=$month_start, year_start=$year_start, minute_end=$minute_end, hour_end=$hour_end, day_end=$day_end, month_end=$month_end, year_end=$year_end, cron_expression='$cron_expression', created_at='$created_at', deleted_at='$deleted_at'";
+  $query = "INSERT INTO server_scheduled_events SET id=$id, description='$description', event_type='$event_type', event_data='$event_data', minute_start=$minute_start, hour_start=$hour_start, day_start=$day_start, month_start=$month_start, year_start=$year_start, minute_end=$minute_end, hour_end=$hour_end, day_end=$day_end, month_end=$month_end, year_end=$year_end, cron_expression='$cron_expression', created_at=NULL, deleted_at=NULL";
   $mysql->query_no_result($query);
+
+  if ($created_at) {
+    $query = "UPDATE server_scheduled_events SET created_at='$created_at' WHERE id=$id";
+    $mysql->query_no_result($query);
+  }
+
+  if ($deleted_at) {
+    $query = "UPDATE server_scheduled_events SET deleted_at='$deleted_at' WHERE id=$id";
+    $mysql->query_no_result($query);
+  }
 }
 
 function update_scheduled_event() {
@@ -1532,8 +1508,18 @@ function update_scheduled_event() {
   $created_at = $_POST['created_at'];
   $deleted_at = $_POST['deleted_at'];
 
-  $query = "UPDATE server_scheduled_events SET description='$description', event_type='$event_type', event_data='$event_data', minute_start=$minute_start, hour_start=$hour_start, day_start=$day_start, month_start=$month_start, year_start=$year_start, minute_end=$minute_end, hour_end=$hour_end, day_end=$day_end, month_end=$month_end, year_end=$year_end, cron_expression='$cron_expression', created_at='$created_at', deleted_at='$deleted_at' WHERE id=$id";
+  $query = "UPDATE server_scheduled_events SET description='$description', event_type='$event_type', event_data='$event_data', minute_start=$minute_start, hour_start=$hour_start, day_start=$day_start, month_start=$month_start, year_start=$year_start, minute_end=$minute_end, hour_end=$hour_end, day_end=$day_end, month_end=$month_end, year_end=$year_end, cron_expression='$cron_expression', created_at=NULL, deleted_at=NULL WHERE id=$id";
   $mysql->query_no_result($query);
+
+  if ($created_at) {
+    $query = "UPDATE server_scheduled_events SET created_at='$created_at' WHERE id=$id";
+    $mysql->query_no_result($query);
+  }
+
+  if ($deleted_at) {
+    $query = "UPDATE server_scheduled_events SET deleted_at='$deleted_at' WHERE id=$id";
+    $mysql->query_no_result($query);
+  }
 }
 
 function delete_scheduled_event($id) {
@@ -1551,4 +1537,247 @@ function suggest_scheduled_event_id() {
 
   return $result['id'] + 1;
 }
+
+function get_char_create_combo($race, $class, $deity, $start_zone) {
+  global $mysql_content_db;
+
+  $query = "SELECT * FROM char_create_combinations WHERE race=$race AND class=$class AND deity=$deity AND start_zone=$start_zone";
+  $result = $mysql_content_db->query_assoc($query);
+
+  if ($result) {
+    return $result;
+  }
+  else {
+    return null;
+  }
+}
+
+function replace_char_create_combo() {
+  global $mysql_content_db;
+
+  $allocation_id = $_POST['allocation_id'];
+  $race = $_POST['race'];
+  $class = $_POST['class'];
+  $deity = $_POST['deity'];
+  $start_zone = $_POST['start_zone'];
+  $expansions_req = $_POST['expansions_req'];
+
+  $query = "REPLACE INTO char_create_combinations SET allocation_id=$allocation_id, race=$race, class=$class, deity=$deity, start_zone=$start_zone, expansions_req=$expansions_req";
+  $mysql_content_db->query_no_result($query);
+}
+
+function delete_char_create_combo($race, $class, $deity, $start_zone) {
+  global $mysql_content_db;
+
+  $query = "DELETE FROM char_create_combinations WHERE race=$race AND class=$class AND deity=$deity AND start_zone=$start_zone";
+  $mysql_content_db->query_no_result($query);
+}
+
+function add_bug_review() {
+  global $mysql;
+
+  $id = $_POST['id'];
+  $new_reviewer = $_POST['new_reviewer'];
+  $new_review = $_POST['new_review'];
+
+  $query = "UPDATE bug_reports SET last_review=NOW(), last_reviewer=\"$new_reviewer\", reviewer_notes=\"$new_review\" WHERE id=$id";
+  $mysql->query_no_result($query);
+}
+
+function get_player_event_logs($page_number, $results_per_page, $sort_by, $where = "") {
+  global $mysql;
+
+  $limit = ($page_number - 1) * $results_per_page . "," . $results_per_page;
+
+  $query = "SELECT * FROM player_event_logs";
+  if ($where) {
+    $query .= " WHERE $where";
+  }
+  $query .= " ORDER BY $sort_by LIMIT $limit";
+
+  $results = $mysql->query_mult_assoc($query);
+
+  if ($results) {
+    return $results;
+  }
+  else {
+    return null;
+  }
+}
+
+function get_player_event($id) {
+  global $mysql;
+
+  $query = "SELECT * FROM player_event_logs WHERE id=$id";
+  $result = $mysql->query_assoc($query);
+
+  if ($result) {
+    return $result;
+  }
+  else {
+    return null;
+  }
+}
+
+function delete_player_event($id) {
+  global $mysql;
+
+  $query = "DELETE FROM player_event_logs WHERE id=$id";
+  $mysql->query_no_result($query);
+}
+
+function get_player_event_log_settings() {
+  global $mysql;
+
+  $query = "SELECT * FROM player_event_log_settings";
+  $results = $mysql->query_mult_assoc($query);
+
+  if ($results) {
+    return $results;
+  }
+  else {
+    return null;
+  }
+}
+
+function get_player_event_log_setting($id) {
+  global $mysql;
+
+  $query = "SELECT * FROM player_event_log_settings WHERE id=$id";
+  $result = $mysql->query_assoc($query);
+
+  if ($result) {
+    return $result;
+  }
+  else {
+    return null;
+  }
+}
+
+function insert_player_event_log_setting() {
+  global $mysql;
+
+  $id = $_POST['id'];
+  $event_name = $_POST['event_name'];
+  $event_enabled = $_POST['event_enabled'];
+  $retention_days = $_POST['retention_days'];
+  $discord_webhook_id = $_POST['discord_webhook_id'];
+
+  $query = "INSERT INTO player_event_log_settings SET id=$id, event_name=\"$event_name\", event_enabled=$event_enabled, retention_days=$retention_days, discord_webhook_id=$discord_webhook_id";
+  $mysql->query_no_result($query);
+}
+
+function update_player_event_log_setting() {
+  global $mysql;
+
+  $id = $_POST['id'];
+  $event_name = $_POST['event_name'];
+  $event_enabled = $_POST['event_enabled'];
+  $retention_days = $_POST['retention_days'];
+  $discord_webhook_id = $_POST['discord_webhook_id'];
+
+  $query = "UPDATE player_event_log_settings SET event_name=\"$event_name\", event_enabled=$event_enabled, retention_days=$retention_days, discord_webhook_id=$discord_webhook_id WHERE id=$id";
+  $mysql->query_no_result($query);
+}
+
+function delete_player_event_log_setting($id) {
+  global $mysql;
+
+  $query = "DELETE FROM player_event_log_settings WHERE id=$id";
+  $mysql->query_no_result($query);
+}
+
+function suggest_player_event_log_setting_id() {
+  global $mysql;
+
+  $query = "SELECT MAX(id) AS id FROM player_event_log_settings";
+  $result = $mysql->query_assoc($query);
+
+  return ($result) ? $result['id'] + 1 : 1;
+}
+
+function build_filter() {
+  global $mysql, $mysql_content_db;
+
+  $filter1 = $_GET['filter1'];
+  $filter2 = $_GET['filter2'];
+  $filter3 = $_GET['filter3'];
+  $filter4 = $_GET['filter4'];
+  $filter_final = array();
+  $filter_final['sql'] = "";
+
+  if ($filter1) { // Filter by account
+    $query = "SELECT id FROM account WHERE name LIKE \"%$filter1%\"";
+    $results = $mysql->query_mult_assoc($query);
+    $filter_account_id = "account_id IN (";
+    if ($results) {
+      foreach ($results as $result) {
+        $filter_account_id .= $result['id'] . ",";
+      }
+      $filter_account_id = rtrim($filter_account_id, ",");
+    }
+    else {
+      $filter_account_id .= "NULL";
+    }
+    $filter_account_id .= ")";
+    if ($filter_final['sql']) {
+      $filter_final['sql'] .= " AND ";
+    }
+    $filter_final['sql'] .= $filter_account_id;
+  }
+  if ($filter2) { // Filter by player
+    $query = "SELECT id FROM character_data WHERE name LIKE \"%$filter2%\"";
+    $results = $mysql->query_mult_assoc($query);
+    $filter_character_id = "character_id IN (";
+    if ($results) {
+      foreach ($results as $result) {
+        $filter_character_id .= $result['id'] . ",";
+      }
+      $filter_character_id = rtrim($filter_character_id, ",");
+    }
+    else {
+      $filter_character_id .= "NULL";
+    }
+    $filter_character_id .= ")";
+    if ($filter_final['sql']) {
+      $filter_final['sql'] .= " AND ";
+    }
+    $filter_final['sql'] .= $filter_character_id;
+  }
+  if ($filter3) { // Filter by zone
+    $query = "SELECT zoneidnumber FROM zone WHERE short_name LIKE \"%$filter3%\"";
+    $results = $mysql_content_db->query_mult_assoc($query);
+    $filter_zone_id = "zone_id IN (";
+    if ($results) {
+      foreach ($results as $result) {
+        $filter_zone_id .= $result['zoneidnumber'] . ",";
+      }
+      $filter_zone_id = rtrim($filter_zone_id, ",");
+    }
+    else {
+      $filter_zone_id .= "NULL";
+    }
+    $filter_zone_id .= ")";
+    if ($filter_final['sql']) {
+      $filter_final['sql'] .= " AND ";
+    }
+    $filter_final['sql'] .= $filter_zone_id;
+  }
+  if ($filter4) { // Filter by event type
+    $filter_event_type_name = "event_type_name LIKE '%" . $filter4 . "%'";
+    if ($filter_final['sql']) {
+      $filter_final['sql'] .= " AND ";
+    }
+    $filter_final['sql'] .= $filter_event_type_name;
+  }
+  $filter_final['url'] = "&filter=on&filter1=$filter1&filter2=$filter2&filter3=$filter3&filter4=$filter4";
+  $filter_final['status'] = "on";
+  $filter_final['filter1'] = $filter1;
+  $filter_final['filter2'] = $filter2;
+  $filter_final['filter3'] = $filter3;
+  $filter_final['filter4'] = $filter4;
+
+  return $filter_final;
+}
+
 ?>

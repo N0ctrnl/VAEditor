@@ -1,4 +1,4 @@
-  <div class="edit_form" style="width: 300px;">
+  <div class="edit_form" style="width: 350px;">
     <div class="edit_form_header">Create New Recipe</div>
     <div class="edit_form_content">
       <form method="post" action="index.php?editor=tradeskill&action=11">
@@ -48,7 +48,9 @@
           <select name='l_search' onChange="javascript:updateLearn();">
             <option value="0" selected>Yes</option>
             <option value="32">No</option>
-          </select>
+          </select><br><br>
+          <strong>Learn Item ID:</strong><br>
+          <input type="text" name="learned_by_item_id" size="10" value="0">
         </fieldset><br>
         <strong>Enabled:</strong><br>
         <select name="enabled">
@@ -56,9 +58,9 @@
           <option value="1" selected>yes</option>
         </select><br><br>
         <strong>Min Expansion:</strong><br>
-        <input type="text" name="min_expansion" size="7" value="0"><br><br>
+        <input type="text" name="min_expansion" size="7" value="-1"><br><br>
         <strong>Max Expansion:</strong><br>
-        <input type="text" name="max_expansion" size="7" value="0"><br><br>
+        <input type="text" name="max_expansion" size="7" value="-1"><br><br>
         <strong>Content Flags:</strong><br>
         <input type="text" name="content_flags" size="41" value=""><br><br>
         <strong>Content Flags Disabled:</strong><br>
